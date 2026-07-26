@@ -14,8 +14,8 @@ async function startServer() {
   const PORT = 3000;
 
   // Use body parsing with responsive byte limits for raw base64 uploads
-  app.use(express.json({ limit: '15mb' }));
-  app.use(express.urlencoded({ extended: true, limit: '15mb' }));
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
   // Serve uploads or public assets if custom images are stored on-disk
   const uploadsPath = path.join(process.cwd(), 'server', 'uploads');

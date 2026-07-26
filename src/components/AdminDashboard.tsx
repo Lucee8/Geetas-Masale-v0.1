@@ -10,7 +10,7 @@
     Star, MessageSquare, Settings, LogOut, Plus, Edit2, Trash2, Search, 
     Check, X, Truck, AlertCircle, Eye, RefreshCw, Smartphone, Key,
     XCircle, Filter, Tag, Image, CheckCircle, Store, Send,
-    Phone, MessageCircle, MoreVertical, ChevronLeft, ChevronRight, Download, Printer, FileText
+    Phone, MessageCircle, MoreaVertical, ChevronLeft, ChevronRight, Download, Printer, FileText
   } from 'lucide-react';
   import { isFirebaseConfigured, db, auth, isVercel } from '../lib/firebase';
   import { 
@@ -496,21 +496,80 @@
       onClose();
     };
 
-    // Convert uploaded image file locally to Base64 (STEP 17 - Save base64 string in DB file)
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, objectType: 'product' | 'category') => {
+    const compressImage = (file: File, maxWidth = 1000, maxHeight = 1000, quality = 0.82): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        if (!file.type.startsWith('image/') || file.type.includes('svg')) {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+          return;
+        }
+
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+        img.onload = () => {
+          URL.revokeObjectURL(objectUrl);
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth || height > maxHeight) {
+            if (width / height > maxWidth / maxHeight) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            } else {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+            return;
+          }
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+          resolve(compressedBase64);
+        };
+        img.onerror = (err) => {
+          URL.revokeObjectURL(objectUrl);
+          reject(err);
+        };
+        img.src = objectUrl;
+      });
+    };
+
+    // Convert uploaded image file locally to compressed Base64
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, objectType: 'product' | 'category') => {
       const file = e.target.files?.[0];
       if (!file) return;
 
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
+      try {
+        const compressedBase64 = await compressImage(file);
         if (objectType === 'product') {
-          setProductForm(prev => ({ ...prev, image: base64String }));
+          setProductForm(prev => ({ ...prev, image: compressedBase64 }));
         } else {
-          setCategoryForm(prev => ({ ...prev, image: base64String }));
+          setCategoryForm(prev => ({ ...prev, image: compressedBase64 }));
         }
-      };
-      reader.readAsDataURL(file);
+      } catch (err) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64String = reader.result as string;
+          if (objectType === 'product') {
+            setProductForm(prev => ({ ...prev, image: base64String }));
+          } else {
+            setCategoryForm(prev => ({ ...prev, image: base64String }));
+          }
+        };
+        reader.readAsDataURL(file);
+      }
     };
 
     // Products Submit
@@ -542,17 +601,24 @@
           },
           body: JSON.stringify(productForm)
         });
-        const data = await res.json();
+
+        let data: any = {};
+        try {
+          data = await res.json();
+        } catch (jsonErr) {
+          console.error("Non-JSON API response:", jsonErr);
+        }
+
         if (res.ok) {
           showToast(isEditing ? 'Product modified successfully.' : 'Product listed successfully.');
           setIsProductModalOpen(false);
           setEditingProduct(null);
           loadDataForTab();
         } else {
-          alert(data.error || 'Failed to submit product.');
+          alert(data.error || `Server returned error (${res.status}): ${res.statusText || 'Failed to submit product.'}`);
         }
-      } catch (err) {
-        alert('Error saving product.');
+      } catch (err: any) {
+        alert(err?.message || 'Error saving product.');
       } finally {
         setSubmitting(false);
       }
@@ -669,17 +735,24 @@
           },
           body: JSON.stringify(categoryForm)
         });
-        const data = await res.json();
+
+        let data: any = {};
+        try {
+          data = await res.json();
+        } catch (jsonErr) {
+          console.error("Non-JSON API response:", jsonErr);
+        }
+
         if (res.ok) {
           showToast(isEditing ? 'Category successfully modified.' : 'New department category created.');
           setIsCategoryModalOpen(false);
           setEditingCategory(null);
           loadDataForTab();
         } else {
-          alert(data.error || 'Failed to submit category.');
+          alert(data.error || `Server returned error (${res.status}): ${res.statusText || 'Failed to submit category.'}`);
         }
-      } catch (err) {
-        alert('Error saving category.');
+      } catch (err: any) {
+        alert(err?.message || 'Error saving category.');
       } finally {
         setSubmitting(false);
       }
