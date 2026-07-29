@@ -10,7 +10,7 @@
     Star, MessageSquare, Settings, LogOut, Plus, Edit2, Trash2, Search, 
     Check, X, Truck, AlertCircle, Eye, RefreshCw, Smartphone, Key,
     XCircle, Filter, Tag, Image, CheckCircle, Store, Send,
-    Phone, MessageCircle, MoreaVertical, ChevronLeft, ChevronRight, Download, Printer, FileText
+    Phone, MessageCircle, MoreVertical, ChevronLeft, ChevronRight, Download, Printer, FileText
   } from 'lucide-react';
   import { isFirebaseConfigured, db, auth, isVercel } from '../lib/firebase';
   import { 
@@ -496,11 +496,18 @@
       onClose();
     };
 
-    const compressImage = (file: File, maxWidth = 1000, maxHeight = 1000, quality = 0.82): Promise<string> => {
+    const compressImage = (file: File, initialMaxWidth = 1000, initialMaxHeight = 1000, initialQuality = 0.8): Promise<string> => {
       return new Promise((resolve, reject) => {
         if (!file.type.startsWith('image/') || file.type.includes('svg')) {
           const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
+          reader.onloadend = () => {
+            const res = reader.result as string;
+            if (res.length > 1000000) {
+              reject(new Error("File is too large and cannot be compressed (must be < 1MB)."));
+            } else {
+              resolve(res);
+            }
+          };
           reader.onerror = reject;
           reader.readAsDataURL(file);
           return;
@@ -508,36 +515,62 @@
 
         const img = new Image();
         const objectUrl = URL.createObjectURL(file);
+        
         img.onload = () => {
           URL.revokeObjectURL(objectUrl);
-          let width = img.width;
-          let height = img.height;
+          
+          let currentMaxWidth = initialMaxWidth;
+          let currentMaxHeight = initialMaxHeight;
+          let currentQuality = initialQuality;
+          let attempt = 0;
+          const MAX_ATTEMPTS = 5;
+          const TARGET_SIZE_BYTES = 800000; // Safe limit below 1,048,487
+          
+          const tryCompress = () => {
+            let width = img.width;
+            let height = img.height;
 
-          if (width > maxWidth || height > maxHeight) {
-            if (width / height > maxWidth / maxHeight) {
-              height = Math.round((height * maxWidth) / width);
-              width = maxWidth;
-            } else {
-              width = Math.round((width * maxHeight) / height);
-              height = maxHeight;
+            if (width > currentMaxWidth || height > currentMaxHeight) {
+              if (width / height > currentMaxWidth / currentMaxHeight) {
+                height = Math.round((height * currentMaxWidth) / width);
+                width = currentMaxWidth;
+              } else {
+                width = Math.round((width * currentMaxHeight) / height);
+                height = currentMaxHeight;
+              }
             }
-          }
 
-          const canvas = document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          if (!ctx) {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result as string);
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-            return;
-          }
-          ctx.drawImage(img, 0, 0, width, height);
-          const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
-          resolve(compressedBase64);
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            
+            if (!ctx) {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result as string);
+              reader.readAsDataURL(file);
+              return;
+            }
+            
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressedBase64 = canvas.toDataURL('image/jpeg', currentQuality);
+            
+            // Check size
+            if (compressedBase64.length > TARGET_SIZE_BYTES && attempt < MAX_ATTEMPTS) {
+              attempt++;
+              currentMaxWidth *= 0.8;
+              currentMaxHeight *= 0.8;
+              currentQuality -= 0.15;
+              if (currentQuality < 0.1) currentQuality = 0.1;
+              tryCompress();
+            } else {
+              resolve(compressedBase64);
+            }
+          };
+          
+          tryCompress();
         };
+        
         img.onerror = (err) => {
           URL.revokeObjectURL(objectUrl);
           reject(err);
