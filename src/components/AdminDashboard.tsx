@@ -125,7 +125,7 @@
 
     // Coupon Form state
     const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
-    const [couponForm, setCouponForm] = useState({
+    const [couponForm, setCouponForm] = useState<{ id?: string | number; code: string; discountType: string; value: number; minOrderAmount: number }>({
       code: '',
       discountType: 'Fixed',
       value: 50,
@@ -1124,19 +1124,21 @@
     const handleCouponSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       setSubmitting(true);
+      const isEdit = !!couponForm.id;
       try {
         if (isFirebaseConfigured && db) {
           const couponId = couponForm.id || `coupon_${Date.now()}`;
           const finalCoupon = { ...couponForm, id: couponId };
-          await setDoc(doc(db, 'coupons', couponId), finalCoupon);
-          showToast('New coupon code created successfully!');
+          await setDoc(doc(db, 'coupons', String(couponId)), finalCoupon);
+          showToast(isEdit ? 'Coupon code updated successfully!' : 'New coupon code created successfully!');
           setIsCouponModalOpen(false);
           loadDataForTab();
           return;
         }
 
-        const res = await fetch('/api/admin/coupons', {
-          method: 'POST',
+        const url = isEdit ? `/api/admin/coupons/${couponForm.id}` : '/api/admin/coupons';
+        const res = await fetch(url, {
+          method: isEdit ? 'PUT' : 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
@@ -1144,15 +1146,51 @@
           body: JSON.stringify(couponForm)
         });
         if (res.ok) {
-          showToast('New coupon code created successfully!');
+          showToast(isEdit ? 'Coupon code updated successfully!' : 'New coupon code created successfully!');
           setIsCouponModalOpen(false);
           loadDataForTab();
         }
       } catch (err) {
-        alert('Error creating coupon.');
+        alert('Error saving coupon.');
       } finally {
         setSubmitting(false);
       }
+    };
+
+    const handleDeleteCoupon = async (id: string | number) => {
+      if (!window.confirm('Delete this coupon code?')) return;
+      try {
+        if (isFirebaseConfigured && db) {
+          await deleteDoc(doc(db, 'coupons', String(id)));
+          showToast('Coupon code deleted.');
+          loadDataForTab();
+          return;
+        }
+
+        const res = await fetch(`/api/admin/coupons/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (res.ok) {
+          showToast('Coupon code deleted.');
+          loadDataForTab();
+        }
+      } catch (err) {
+        alert('Failed to delete coupon.');
+      }
+    };
+
+    const openEditCoupon = (coupon: any) => {
+      setCouponForm({
+        id: coupon.id,
+        code: coupon.code || '',
+        discountType: coupon.discountType || 'Fixed',
+        value: coupon.value || 0,
+        minOrderAmount: coupon.minOrderAmount || 0
+      });
+      setIsCouponModalOpen(true);
     };
 
     // Open Edit Product Modal
@@ -2956,6 +2994,7 @@
                               <th className="px-4 py-3 text-center">Discount Value</th>
                               <th className="px-4 py-3 text-center">Min Order Threshold</th>
                               <th className="px-4 py-3 text-center">Usage Status</th>
+                              <th className="px-4 py-3 text-right">Actions</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -2971,6 +3010,20 @@
                                   <span className="inline-block px-2.5 py-0.5 rounded-full text-[8px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 uppercase">
                                     ACTIVE & LIVE
                                   </span>
+                                </td>
+                                <td className="px-4 py-3 text-right space-x-2">
+                                  <button
+                                    onClick={() => openEditCoupon(c)}
+                                    className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded text-[10px] font-mono font-bold uppercase"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteCoupon(c.id)}
+                                    className="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded text-[10px] font-mono font-bold uppercase"
+                                  >
+                                    Del
+                                  </button>
                                 </td>
                               </tr>
                             ))}
