@@ -496,14 +496,14 @@
       onClose();
     };
 
-    const compressImage = (file: File, initialMaxWidth = 1000, initialMaxHeight = 1000, initialQuality = 0.8): Promise<string> => {
+    const compressImage = (file: File): Promise<string> => {
       return new Promise((resolve, reject) => {
         if (!file.type.startsWith('image/') || file.type.includes('svg')) {
           const reader = new FileReader();
           reader.onloadend = () => {
             const res = reader.result as string;
             if (res.length > 1000000) {
-              reject(new Error("File is too large and cannot be compressed (must be < 1MB)."));
+              reject(new Error("This non-image file is too large (must be < 1MB) and cannot be compressed."));
             } else {
               resolve(res);
             }
@@ -519,56 +519,53 @@
         img.onload = () => {
           URL.revokeObjectURL(objectUrl);
           
-          let currentMaxWidth = initialMaxWidth;
-          let currentMaxHeight = initialMaxHeight;
-          let currentQuality = initialQuality;
-          let attempt = 0;
-          const MAX_ATTEMPTS = 5;
-          const TARGET_SIZE_BYTES = 800000; // Safe limit below 1,048,487
+          const TARGET_MAX_WIDTH = 800;
+          const TARGET_MAX_HEIGHT = 800;
           
-          const tryCompress = () => {
-            let width = img.width;
-            let height = img.height;
+          let width = img.width;
+          let height = img.height;
 
-            if (width > currentMaxWidth || height > currentMaxHeight) {
-              if (width / height > currentMaxWidth / currentMaxHeight) {
-                height = Math.round((height * currentMaxWidth) / width);
-                width = currentMaxWidth;
-              } else {
-                width = Math.round((width * currentMaxHeight) / height);
-                height = currentMaxHeight;
-              }
-            }
-
-            const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            
-            if (!ctx) {
-              const reader = new FileReader();
-              reader.onloadend = () => resolve(reader.result as string);
-              reader.readAsDataURL(file);
-              return;
-            }
-            
-            ctx.drawImage(img, 0, 0, width, height);
-            const compressedBase64 = canvas.toDataURL('image/jpeg', currentQuality);
-            
-            // Check size
-            if (compressedBase64.length > TARGET_SIZE_BYTES && attempt < MAX_ATTEMPTS) {
-              attempt++;
-              currentMaxWidth *= 0.8;
-              currentMaxHeight *= 0.8;
-              currentQuality -= 0.15;
-              if (currentQuality < 0.1) currentQuality = 0.1;
-              tryCompress();
+          // 1. Aspect-Ratio Dimension Scaling
+          if (width > TARGET_MAX_WIDTH || height > TARGET_MAX_HEIGHT) {
+            if (width / height > TARGET_MAX_WIDTH / TARGET_MAX_HEIGHT) {
+              height = Math.round((height * TARGET_MAX_WIDTH) / width);
+              width = TARGET_MAX_WIDTH;
             } else {
-              resolve(compressedBase64);
+              width = Math.round((width * TARGET_MAX_HEIGHT) / height);
+              height = TARGET_MAX_HEIGHT;
             }
-          };
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
           
-          tryCompress();
+          if (!ctx) {
+            reject(new Error("Canvas compression failed"));
+            return;
+          }
+          
+          // 2. Draw downscaled image
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // 3. Lossy JPEG Encoding (Pass 1)
+          let quality = 0.8;
+          let compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+          
+          // 4. Adaptive Safety Threshold Check (~300 KB limit)
+          if (compressedBase64.length > 400000) {
+            // Second pass: lower quality to 0.45 guaranteeing small size
+            quality = 0.45;
+            compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+          }
+          
+          if (compressedBase64.length > 1000000) {
+            reject(new Error("Image is still too large after extreme compression."));
+            return;
+          }
+
+          resolve(compressedBase64);
         };
         
         img.onerror = (err) => {
@@ -591,17 +588,9 @@
         } else {
           setCategoryForm(prev => ({ ...prev, image: compressedBase64 }));
         }
-      } catch (err) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64String = reader.result as string;
-          if (objectType === 'product') {
-            setProductForm(prev => ({ ...prev, image: base64String }));
-          } else {
-            setCategoryForm(prev => ({ ...prev, image: base64String }));
-          }
-        };
-        reader.readAsDataURL(file);
+      } catch (err: any) {
+        alert(err.message || "Failed to process image. It may be too large.");
+        e.target.value = ''; // Reset input
       }
     };
 
