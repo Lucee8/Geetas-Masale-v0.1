@@ -2410,13 +2410,17 @@
                                   })();
 
                                   // Helper to find the matching product image
-                                  const getProductImg = (productId: string, productName: string) => {
+                                  const getProductImg = (productId: string, productName: string, itemImage?: string) => {
+                                    if (itemImage) return itemImage;
                                     const p = products.find(x => x.id === productId || x.name === productName);
-                                    if (p && p.image) return p.image;
+                                    if (p && p.image) return resolveProductImage(p as any);
+                                    const staticP = PRODUCTS.find(x => x.id === productId || x.name === productName);
+                                    if (staticP && staticP.image) return staticP.image;
+                                    
                                     const nameLower = productName.toLowerCase();
-                                    if (nameLower.includes('malvani')) return 'https://images.unsplash.com/photo-1596797038530-2c107229654b?w=100&auto=format&fit=crop&q=60';
-                                    if (nameLower.includes('garam')) return 'https://images.unsplash.com/photo-1608897013039-887f21d8c804?w=100&auto=format&fit=crop&q=60';
-                                    if (nameLower.includes('biryani')) return 'https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=100&auto=format&fit=crop&q=60';
+                                    if (nameLower.includes('malvani') || nameLower.includes('masala')) return 'https://images.unsplash.com/photo-1596797038530-2c107229654b?w=100&auto=format&fit=crop&q=60';
+                                    if (nameLower.includes('kaju') || nameLower.includes('cashew')) return 'https://images.unsplash.com/photo-1620921575466-9b165b591b65?w=100&auto=format&fit=crop&q=60';
+                                    if (nameLower.includes('chutney')) return 'https://images.unsplash.com/photo-1608897013039-887f21d8c804?w=100&auto=format&fit=crop&q=60';
                                     return 'https://images.unsplash.com/photo-1596797038530-2c107229654b?w=100&auto=format&fit=crop&q=60';
                                   };
 
@@ -2495,7 +2499,7 @@
                                           <div className="flex items-center space-x-2.5">
                                             <div className="relative shrink-0 w-9 h-9 rounded-lg border border-slate-200 overflow-hidden bg-slate-100 flex items-center justify-center">
                                               <img
-                                                src={getProductImg(o.items[0].productId, o.items[0].productName)}
+                                                src={getProductImg(o.items[0].productId, o.items[0].productName, o.items[0].image || o.items[0].productImage)}
                                                 alt={o.items[0].productName}
                                                 className="w-full h-full object-cover"
                                                 referrerPolicy="no-referrer"
@@ -4213,3 +4217,4 @@
       </div>
     );
   }
+  

@@ -652,7 +652,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   // Orders
   const placeOrder = async (orderData: Omit<Order, 'id' | 'userId' | 'createdAt' | 'status'>) => {
     const activeUid = user?.uid || 'guest_' + Date.now();
-    const orderId = `order_${Date.now()}`;
+    const orderDate = new Date();
+    const dd = String(orderDate.getDate()).padStart(2, '0');
+    const mm = String(orderDate.getMonth() + 1).padStart(2, '0');
+    const yy = String(orderDate.getFullYear()).slice(-2);
+    const seq = String(Math.floor(Math.random() * 900) + 100);
+    const orderId = `ORD-${dd}-${mm}-${yy}-${seq}`;
     
     const newOrder: Order = {
       ...orderData,

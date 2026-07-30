@@ -4,14 +4,13 @@
  */
 
 import { Product, Recipe, Testimonial, GalleryItem } from '../types';
-import malvaniSundayMasala from '../assets/images/Masale/malvani spl Sunday masala.webP';
+import malvaniSundayMasala from '../assets/images/Masale/malvani-spl-sunday-masala.webp';
 import frymasala from '../assets/images/Masale/Malvani fish fry masala.webP';
 import Biryanimasala from '../assets/images/Masale/Biryani masala.webP';
-import Kashmirimirchi from '../assets/images/Masale/Kashmiri mirchi powder.webP';
+import Kashmirimirchi from '../assets/images/Masale/Kashmiri mirchi powder copy.webP';
 import specialbhajka from '../assets/images/Masale/Malvani special bhajka masala.webP';
 import muttonmasala from '../assets/images/Masale/malvani special mutton masala.webP';
 import currymasala from '../assets/images/Masale/malvani fish curry masala.webP';
-import KhobraLasunChutney from '../assets/images/Masale/khobra lasun chutney.webP';
 import kandaLasunMasala from '../assets/images/Masale/Kanda lasun masala.webP';
 import specialmisal from '../assets/images/Masale/special misal masala.webP';
 import shengdanachutney from '../assets/images/Masale/shengdana chutney.webP';
@@ -37,48 +36,48 @@ import Khadkhadeladdoo from '../assets/images/Laddoos/Khadkhade laddoo.webP';
 import Kadakbundiladdoo from '../assets/images/Laddoos/Kadak bundi laddoo.webP';
 import Shevladdoo from '../assets/images/Laddoos/Shev laddoo.webP';
 import Shengdanaladdoo from '../assets/images/Laddoos/Shengdana laddoo.webP';
-import polishkaju2 from '../assets/images/Kaju/polish kaju 2 (big size).webP';
-import Salwalekaju2 from '../assets/images/Kaju/Salwale kaju 2 (big size).webP';
-import Salwalekaju4 from '../assets/images/Kaju/Salwale kaju 4 (medium size).webP';
+import polishkaju2 from '../assets/images/Kaju/polish kaju (big size).webP';
+import Salwalekaju2 from '../assets/images/Kaju/Salwale kaju (big size).webP';
+import Salwalekaju4 from '../assets/images/Kaju/Salwale kaju (medium size).webP';
 import Saltedkaju from '../assets/images/Kaju/Salted kaju.webP';
 import Masalakaju from '../assets/images/Kaju/Masala kaju.webP';
 import Tukdakaju from '../assets/images/Kaju/Tukda kaju.webP';
-import polishkaju4 from '../assets/images/Kaju/polish kaju 4 (medium size).webP';
+import polishkaju4 from '../assets/images/Kaju/polish kaju (medium size).webP';
 
 // Static assets for categories, gallery, and recipes to ensure Vite bundles them successfully in production
-import masalaHeroImage from '../assets/images/categories/Malvani Masalas & Chutneys.webP';
-import TraditionalFlours from '../assets/images/categories/Traditional Flours.webP';
-import mevaImage from '../assets/images/categories/meva.png';
-import HandmadeLaddoos from '../assets/images/categories/Handmade Laddoos.webP';
-import cashewPremiumImage from '../assets/images/categories/Cashews.webP';
+import cookingImage from '../assets/images/malvani_cooking_1780594653286.png';
+import storefrontImage from '../assets/images/geetas_storefront_1780594715235.png';
+import interiorImage from '../assets/images/geetas_interior_1780594732720.png';
+import masalaHeroImage from '../assets/images/masala_hero_1780594616996.png';
+import cashewPremiumImage from '../assets/images/cashew_premium_1780594672474.png';
 
 export const CATEGORIES = [
   {
     id: 'Masale',
     name: 'Malvani Masalas & Chutneys',
     description: 'Generations of expertise in roasting and blending coastal spices, red chillies, and garlic.',
-    image: masalaHeroImage,
+    image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&auto=format&fit=crop&q=80',
     count: 11
   },
   {
     id: 'Pith',
     name: 'Traditional Flours (Pith)',
     description: 'Freshly milled rice, pulse, and grain flours prepared for authentic Bhakri, Vade, and Modak.',
-    image: TraditionalFlours,
+    image: 'https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=600&auto=format&fit=crop&q=80',
     count: 7
   },
   {
     id: 'Malvani products',
     name: 'Konkan Specialties & Meva',
     description: 'Sun-dried Kokum, parboiled rice, fruit leathers (Poli), and authentic farm-fresh items.',
-    image: mevaImage,
+    image: 'https://images.unsplash.com/photo-1626132647523-66f5bf380027?w=600&auto=format&fit=crop&q=80',
     count: 11
   },
   {
     id: 'Laddoos',
     name: 'Handmade Laddoos',
     description: 'Sweet, nutritious daily delicacies rolled with pure ghee, organic jaggery, peanuts, and dry fruits.',
-    image: HandmadeLaddoos,
+    image: 'https://images.unsplash.com/photo-1581781868311-6415779c13dd?w=600&auto=format&fit=crop&q=80',
     count: 4
   },
   {
@@ -201,7 +200,7 @@ export const PRODUCTS: Product[] = [
     usage: 'Ready to consume. Best enjoyed alongside freshly made hot Bajra/Jowar Bhakris, Vada Pav, or simply mixed with oil over warm rice.',
     shelfLife: '6 Months',
     notes: 'No preservatives, very low moisture content for enduring crunch.',
-    image: KhobraLasunChutney
+    image: kandaLasunMasala
   },
   {
     id: 'm9',
@@ -676,7 +675,7 @@ export const RECIPES: Recipe[] = [
       'Shallow fry the fish for 6-7 minutes on each side until the outer skin turns deep dark golden-brown and crispy.',
       'Drain on clean plates and serve screaming hot garnished with onions and lemon slices.'
     ],
-    image: masalaHeroImage
+    image: cookingImage
   },
   {
     id: 'r2',
@@ -707,7 +706,7 @@ export const RECIPES: Recipe[] = [
       'Meanwhile, knead Geetas Vade Pith with warm water, shape small rounds over damp wrap, deep-fry in smoking oil until fully puffed and golden.',
       'Serve chicken rassa in deep brass bowls alongside steaming hot puffed Kombdi Vade.'
     ],
-    image: masalaHeroImage
+    image: cookingImage
   },
   {
     id: 'r3',
@@ -780,13 +779,13 @@ export const GALLERY_PHOTOS: GalleryItem[] = [
     id: 'g1',
     title: 'Geeta’s Masale Kasal Storefront',
     category: 'Store',
-    image: mevaImage
+    image: storefrontImage
   },
   {
     id: 'g2',
     title: 'Boutique Shelves Filled with Spices',
     category: 'Interior',
-    image: mevaImage
+    image: interiorImage
   },
   {
     id: 'g3',
@@ -810,7 +809,7 @@ export const GALLERY_PHOTOS: GalleryItem[] = [
     id: 'g6',
     title: 'Freshly Steamed Malvani Chicken & Vatan',
     category: 'Cooking',
-    image: mevaImage
+    image: cookingImage
   }
 ];
 
@@ -826,3 +825,4 @@ export function resolveProductImage(p: Product | null | undefined): string {
   // 2. Fallback to the image property (e.g. if custom created product from admin dashboard)
   return p.image || '';
 }
+
