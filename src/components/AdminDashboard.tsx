@@ -225,36 +225,36 @@
               const itemsOnHandCount = productsList.reduce((sum: number, p: any) => sum + (p.stock || 0), 0);
               const lowStockThresholdCount = productsList.filter((p: any) => p.stock < 15).length;
 
-              const recentOrders: any[] = [];
+              const allRecentItems: any[] = [];
+              let globalCounter = 1;
               ordersList
                 .slice()
                 .sort((a: any, b: any) => {
                    const dA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
                    const dB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-                   return dB - dA;
+                   return dA - dB; // Ascending for numbering
                 })
-                .slice(0, 10)
                 .forEach((o: any) => {
                    const orderDate = new Date(o.createdAt || new Date());
                    const yy = String(orderDate.getFullYear()).slice(-2);
                    const mm = String(orderDate.getMonth() + 1).padStart(2, '0');
-                   const dd = String(orderDate.getDate()).padStart(2, '0');
-                   const prefix = `order_${yy}${mm}${dd}`;
+                   const prefix = `order_${yy}${mm}`;
                    
                    const items = o.items || [];
                    if (items.length > 0) {
-                     items.forEach((item: any, idx: number) => {
-                       recentOrders.push({
-                         id: `${prefix}${String(idx + 1).padStart(3, '0')}`,
+                     items.forEach((item: any) => {
+                       allRecentItems.push({
+                         id: `${prefix}${String(globalCounter++).padStart(3, '0')}`,
                          customer: o.name || o.customerName || 'Customer',
                          amount: Number(item.price || 0) * Number(item.quantity || 1),
                          status: o.status,
-                         date: o.createdAt || new Date().toISOString()
+                         date: o.createdAt || new Date().toISOString(),
+                         img: item.image || item.productImage
                        });
                      });
                    } else {
-                     recentOrders.push({
-                       id: o.id,
+                     allRecentItems.push({
+                       id: `${prefix}${String(globalCounter++).padStart(3, '0')}`,
                        customer: o.name || o.customerName || 'Customer',
                        amount: Number(o.total || o.amount || 0),
                        status: o.status,
@@ -262,6 +262,7 @@
                      });
                    }
                 });
+              const recentOrders = allRecentItems.reverse().slice(0, 10);
 
               const catDistribution: { [key: string]: number } = {};
               productsList.forEach((p: any) => {
@@ -4217,4 +4218,3 @@
       </div>
     );
   }
-  
