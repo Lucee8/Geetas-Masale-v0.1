@@ -513,7 +513,7 @@
           return;
         }
 
-        const img = new Image();
+        const img = new window.Image();
         const objectUrl = URL.createObjectURL(file);
         
         img.onload = () => {
