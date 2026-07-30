@@ -46,8 +46,7 @@
     const [adminUser, setAdminUser] = useState<any>(null);
 
     // Active Tab
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'categories' | 'orders' | 'customers' | 'reviews' | 'contacts' | 'settings' | 'coupons'>('dashboard');
-    const [contactsSubTab, setContactsSubTab] = useState<'orders' | 'messages'>('orders');
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'categories' | 'orders' | 'customers' | 'reviews' | 'settings' | 'coupons'>('dashboard');
 
     // API Data Status
     const [analytics, setAnalytics] = useState<any>(null);
@@ -56,7 +55,6 @@
     const [orders, setOrders] = useState<any[]>([]);
     const [customers, setCustomers] = useState<any[]>([]);
     const [reviews, setReviews] = useState<any[]>([]);
-    const [contacts, setContacts] = useState<any[]>([]);
     const [settings, setSettings] = useState<any>(null);
     const [coupons, setCoupons] = useState<any[]>([]);
     
@@ -273,13 +271,6 @@
             } else if (activeTab === 'reviews') {
               const reviewSnap = await getDocs(collection(db, 'reviews'));
               setReviews(reviewSnap.docs.map(d => ({ id: d.id, ...d.data() })));
-            } else if (activeTab === 'contacts') {
-              const [contactSnap, orderSnap] = await Promise.all([
-                getDocs(collection(db, 'contacts')),
-                getDocs(collection(db, 'orders'))
-              ]);
-              setContacts(contactSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a: any, b: any) => b.createdAt?.localeCompare(a.createdAt)));
-              setOrders(orderSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a: any, b: any) => b.createdAt?.localeCompare(a.createdAt)));
             } else if (activeTab === 'settings') {
               const settingsSnap = await getDoc(doc(db, 'settings', 'store_settings'));
               if (settingsSnap.exists()) {
@@ -357,13 +348,6 @@
         } else if (activeTab === 'reviews') {
           const data = await safeFetchJson('/api/admin/reviews', { headers });
           setReviews(data);
-        } else if (activeTab === 'contacts') {
-          const [contactData, orderData] = await Promise.all([
-            safeFetchJson('/api/admin/contact', { headers }),
-            safeFetchJson('/api/admin/orders', { headers })
-          ]);
-          setContacts(contactData);
-          setOrders(orderData);
         } else if (activeTab === 'settings') {
           const data = await safeFetchJson('/api/settings');
           setSettings(data);
@@ -1102,32 +1086,6 @@
       }
     };
 
-    // Contact status mark (New, In Progress, Resolved) (STEP 12)
-    const handleInquiryStatusChange = async (id: number, newStatus: string) => {
-      try {
-        if (isFirebaseConfigured && db) {
-          await updateDoc(doc(db, 'contacts', String(id)), { status: newStatus });
-          showToast(`Inquiry status updated to ${newStatus}.`);
-          loadDataForTab();
-          return;
-        }
-
-        const res = await fetch(`/api/admin/contact/${id}/status`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ status: newStatus })
-        });
-        if (res.ok) {
-          showToast(`Inquiry status updated to ${newStatus}.`);
-          loadDataForTab();
-        }
-      } catch (err) {
-        alert('Failed to modify inquiry status.');
-      }
-    };
 
     // Website Settings Submit (STEP 14)
     const handleSettingsSubmit = async (e: React.FormEvent) => {
@@ -1469,16 +1427,6 @@
                 <span>Testimonials</span>
               </button>
 
-              <button
-                onClick={() => setActiveTab('contacts')}
-                className={`w-full flex items-center space-x-2.5 py-2.5 px-3 rounded-xl text-xs font-mono font-bold uppercase transition-all tracking-wider ${
-                  activeTab === 'contacts' ? 'bg-[#A61B1B] text-white' : 'hover:bg-slate-800 hover:text-white'
-                }`}
-              >
-                <MessageSquare className="w-4 h-4 shrink-0" />
-                <span>Inquiries</span>
-              </button>
-
               <span className="block px-2 text-[8px] font-mono font-black tracking-[0.25em] text-slate-500 uppercase mt-4 mb-1.5">
                 Layout Settings
               </span>
@@ -1640,19 +1588,6 @@
                             Under 15 items remaining
                           </span>
                         </div>
-
-                        <div className="bg-white p-4 rounded-2xl border border-slate-150 shadow-sm text-left">
-                          <span className="block text-[9px] font-mono text-slate-400 uppercase font-black tracking-widest leading-none mb-1">
-                            Pending Inquiries
-                          </span>
-                          <div className="text-2xl font-black text-slate-800">
-                            {analytics.summary?.unreadInquiriesCount || 0} NEW
-                          </div>
-                          <span className="text-[9px] font-mono text-rose-500 mt-1 block">
-                            Requires staff reply
-                          </span>
-                        </div>
-
                       </div>
 
                       {/* Sales charts & category share visualizers */}
@@ -2842,204 +2777,6 @@
                         ))}
                       </div>
 
-                    </div>
-                  )}
-
-
-                  {/* ========================================== */}
-                  {/* 7. CONTACT MESSAGES (STEP 12)             */}
-                  {/* ========================================== */}
-                  {activeTab === 'contacts' && (
-                    <div className="space-y-4 animate-fadeIn text-left">
-                      
-                      {/* Sub-tabs segment switcher */}
-                      <div className="flex space-x-2 border-b border-slate-100 pb-2">
-                        <button
-                          onClick={() => setContactsSubTab('orders')}
-                          className={`px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase transition ${
-                            contactsSubTab === 'orders'
-                              ? 'bg-[#A61B1B] text-white'
-                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                          }`}
-                        >
-                          Order Inquiries ({orders.filter(o => o.status === 'Inquiry').length})
-                        </button>
-                        <button
-                          onClick={() => setContactsSubTab('messages')}
-                          className={`px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase transition ${
-                            contactsSubTab === 'messages'
-                              ? 'bg-[#A61B1B] text-white'
-                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                          }`}
-                        >
-                          Contact Messages ({contacts.length})
-                        </button>
-                      </div>
-
-                      {contactsSubTab === 'orders' ? (
-                        <div className="bg-white rounded-2xl border border-slate-150 shadow-sm overflow-hidden">
-                          <table className="w-full text-xs text-left text-slate-500">
-                            <thead className="text-[10px] uppercase font-mono text-slate-400 bg-slate-50">
-                              <tr className="border-b border-slate-150">
-                                <th className="px-4 py-3">Order Details</th>
-                                <th className="px-4 py-3">Ordered Items</th>
-                                <th className="px-4 py-3">Pricing Details</th>
-                                <th className="px-4 py-3 text-center">Order Status</th>
-                                <th className="px-4 py-3 text-center">Payment Status</th>
-                                <th className="px-4 py-3 text-center">Action / Chat</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {orders.filter(o => o.status === 'Inquiry').map((o, idx) => (
-                                <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50/30 transition-colors">
-                                  <td className="px-4 py-3.5">
-                                    <span className="block text-[10px] font-mono font-black text-[#A61B1B] uppercase tracking-wider">{o.id}</span>
-                                    <span className="block font-black text-slate-800 text-xs sm:text-sm uppercase mt-1">{o.customerName || o.name}</span>
-                                    <span className="block text-[9px] font-mono text-slate-500 mt-0.5">{o.customerPhone || o.phone}</span>
-                                    {o.customerEmail || o.email ? (
-                                      <span className="block text-[9px] font-mono text-slate-400">{o.customerEmail || o.email}</span>
-                                    ) : null}
-                                    <span className="block text-[8px] font-mono text-slate-400 mt-1">Date: {new Date(o.createdAt).toLocaleString()}</span>
-                                  </td>
-
-                                  <td className="px-4 py-3.5 max-w-xs">
-                                    <div className="space-y-1">
-                                      {o.items?.map((item: any, itemIdx: number) => (
-                                        <div key={itemIdx} className="text-[11px] font-sans text-slate-700 leading-normal">
-                                          • <span className="font-bold uppercase">{item.productName}</span> 
-                                          <span className="text-slate-500 text-[10px]"> ({item.weight || item.size || 'Pack'})</span>
-                                          <span className="font-mono text-[#A61B1B] font-bold"> x{item.quantity}</span>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </td>
-
-                                  <td className="px-4 py-3.5">
-                                    <span className="block text-xs font-mono font-black text-slate-800">Total: ₹{o.amount || o.total}</span>
-                                    <span className="block text-[10px] font-mono text-emerald-600 font-bold mt-0.5">Paid: ₹{o.paidAmount || 0}</span>
-                                    <span className="block text-[10px] font-mono text-amber-600 font-bold">Pending: ₹{o.pendingAmount || (o.amount || o.total) - (o.paidAmount || 0)}</span>
-                                  </td>
-
-                                  <td className="px-4 py-3.5 text-center">
-                                    <select
-                                      value={o.status}
-                                      onChange={e => handleOrderStatusUpdate(o.id, e.target.value)}
-                                      className="border border-slate-200 rounded-lg px-2 py-1 text-[9px] font-mono font-bold uppercase focus:outline-none bg-rose-50 text-rose-700"
-                                    >
-                                      <option value="Inquiry">Inquiry</option>
-                                      <option value="Pending">Pending</option>
-                                      <option value="Confirmed">Confirmed</option>
-                                      <option value="Processing">Processing</option>
-                                      <option value="Dispatched">Dispatched</option>
-                                      <option value="Out for Delivery">Out for Delivery</option>
-                                      <option value="Delivered">Delivered</option>
-                                      <option value="Cancelled">Cancelled</option>
-                                    </select>
-                                  </td>
-
-                                  <td className="px-4 py-3.5 text-center">
-                                    <select
-                                      value={o.paymentStatus || 'Pending'}
-                                      onChange={e => handleOrderPaymentStatusUpdate(o.id, e.target.value)}
-                                      className={`border border-slate-200 rounded-lg px-2 py-1 text-[9px] font-mono font-bold uppercase focus:outline-none ${
-                                        (o.paymentStatus || 'Pending') === 'Paid' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
-                                      }`}
-                                    >
-                                      <option value="Pending">Pending</option>
-                                      <option value="Paid">Paid</option>
-                                      <option value="Failed">Failed</option>
-                                    </select>
-                                  </td>
-
-                                  <td className="px-4 py-3.5 text-center">
-                                    <a
-                                      href={`https://wa.me/${(o.customerPhone || o.phone || '').replace(/\D/g, '')}?text=Hello%20${encodeURIComponent(o.customerName || o.name)},%20this%20is%20Geeta\'s%20Masale%20staff.%20We%20have%20received%20your%20Order%20Inquiry%20ID%20${o.id}%20for%20total%20amount%20Rs.%20${o.amount || o.total}.%20Please%20send%20your%20payment%20screenshot%20to%20confirm:`}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="inline-flex items-center space-x-1.5 py-1.5 px-3 rounded-lg bg-emerald-600 hover:bg-rose-950 text-white text-[9px] font-mono uppercase tracking-wider transition-all shadow-sm cursor-pointer"
-                                    >
-                                      <Send className="w-3 h-3 text-white fill-current shrink-0" />
-                                      <span>WhatsApp</span>
-                                    </a>
-                                  </td>
-                                </tr>
-                              ))}
-
-                              {orders.filter(o => o.status === 'Inquiry').length === 0 && (
-                                <tr>
-                                  <td colSpan={6} className="p-12 text-center text-slate-400 font-mono text-xs">
-                                    No active Order Inquiries. When a customer places an order, it will appear here immediately!
-                                  </td>
-                                </tr>
-                              )}
-                            </tbody>
-                          </table>
-                        </div>
-                      ) : (
-                        <div className="bg-white rounded-2xl border border-slate-150 shadow-sm overflow-hidden">
-                          <table className="w-full text-xs text-left text-slate-500">
-                            <thead className="text-[10px] uppercase font-mono text-slate-400 bg-slate-50">
-                              <tr className="border-b border-slate-150">
-                                <th className="px-4 py-3">Inquirer Details</th>
-                                <th className="px-4 py-3">Subject Matter</th>
-                                <th className="px-4 py-3">Message Content</th>
-                                <th className="px-4 py-3 text-center">Status Flag</th>
-                                <th className="px-4 py-3 text-center">Respond</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {contacts.map((m, idx) => (
-                                <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50/30 transition-colors">
-                                  <td className="px-4 py-3.5">
-                                    <span className="block font-black text-slate-800 text-xs sm:text-sm uppercase">{m.name}</span>
-                                    <span className="block text-[9px] font-mono text-[#A61B1B] mt-0.5">{m.phone} | {m.email}</span>
-                                    <span className="block text-[8px] font-mono text-slate-400 mt-1">{new Date(m.createdAt).toLocaleString()}</span>
-                                  </td>
-
-                                  <td className="px-4 py-3.5 font-bold text-slate-700 uppercase max-w-xs">{m.subject}</td>
-
-                                  <td className="px-4 py-3.5 text-xs text-slate-600 max-w-sm italic">"{m.message}"</td>
-
-                                  <td className="px-4 py-3.5 text-center">
-                                    <select
-                                      value={m.status || 'New'}
-                                      onChange={e => handleInquiryStatusChange(m.id, e.target.value)}
-                                      className={`border border-slate-200 rounded-lg px-2 py-1 text-[9px] font-mono font-bold uppercase focus:outline-none ${
-                                        m.status === 'Resolved' ? 'bg-emerald-50 text-emerald-700' :
-                                        m.status === 'In Progress' ? 'bg-amber-50 text-amber-700' : 'bg-rose-50 text-rose-700'
-                                      }`}
-                                    >
-                                      <option value="New">New</option>
-                                      <option value="In Progress">In Progress</option>
-                                      <option value="Resolved">Resolved</option>
-                                    </select>
-                                  </td>
-
-                                  <td className="px-4 py-3.5 text-center">
-                                    <a
-                                      href={`https://wa.me/${m.phone.replace(/\D/g, '')}?text=Hello%20${encodeURIComponent(m.name)},%20this%20is%20Geeta\'s%20Masale%20answering%20your%20inquiry%20regarding%20${encodeURIComponent(m.subject)}:`}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="inline-flex items-center space-x-1 py-1.5 px-3 rounded-lg bg-emerald-600 hover:bg-rose-950 text-white text-[9px] font-mono uppercase tracking-wider transition-all shadow-sm cursor-pointer"
-                                    >
-                                      <Send className="w-3 h-3 text-white fill-current shrink-0" />
-                                      <span>WhatsApp</span>
-                                    </a>
-                                  </td>
-                                </tr>
-                              ))}
-
-                              {contacts.length === 0 && (
-                                <tr>
-                                  <td colSpan={5} className="p-12 text-center text-slate-400 font-mono text-xs">
-                                    Clear inquiry board. Customer contact entries will populate live here.
-                                  </td>
-                                </tr>
-                              )}
-                            </tbody>
-                          </table>
-                        </div>
-                      )}
                     </div>
                   )}
 
