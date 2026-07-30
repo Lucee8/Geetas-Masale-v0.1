@@ -213,24 +213,56 @@
               const reviewsList = reviewsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
               // Calculate dynamic real-time metrics!
-              const totalSales = ordersList
+              const totalRevenue = ordersList
                 .filter((o: any) => o.status !== 'Cancelled')
-                .reduce((sum: number, o: any) => sum + Number(o.total || 0), 0);
+                .reduce((sum: number, o: any) => sum + Number(o.total || o.amount || 0), 0);
               
-              const pendingOrders = ordersList.filter((o: any) => ['Pending', 'Confirmed', 'Processing', 'Dispatched'].includes(o.status)).length;
+              const pendingRevenue = ordersList
+                .filter((o: any) => o.status !== 'Cancelled' && o.status !== 'Delivered')
+                .reduce((sum: number, o: any) => sum + Number(o.pendingAmount || o.total || o.amount || 0), 0);
+
+              const itemsOnHandCount = productsList.reduce((sum: number, p: any) => sum + (p.stock || 0), 0);
+              const lowStockThresholdCount = productsList.filter((p: any) => p.stock < 15).length;
+
+              const recentOrders = ordersList
+                .slice()
+                .sort((a: any, b: any) => {
+                   const dA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+                   const dB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+                   return dB - dA;
+                })
+                .slice(0, 5)
+                .map((o: any) => ({
+                  id: o.id,
+                  customer: o.name || o.customerName || 'Customer',
+                  amount: Number(o.total || o.amount || 0),
+                  status: o.status,
+                  date: o.createdAt || new Date().toISOString()
+                }));
+
+              const catDistribution: { [key: string]: number } = {};
+              productsList.forEach((p: any) => {
+                catDistribution[p.category] = (catDistribution[p.category] || 0) + 1;
+              });
 
               setAnalytics({
-                metrics: {
-                  totalRevenue: totalSales,
-                  ordersCount: ordersList.length,
-                  productsCount: productsList.length,
-                  pendingCount: pendingOrders,
-                  growthRate: 15.2,
-                  satisfactionRate: 4.9
+                summary: {
+                  totalRevenue,
+                  pendingRevenue,
+                  totalOrdersCount: ordersList.length,
+                  itemCategoriesCount: Object.keys(catDistribution).length,
+                  totalApprovedReviewsCount: reviewsList.filter((r: any) => r.approved).length,
+                  pendingReviewsCount: reviewsList.filter((r: any) => !r.approved).length,
+                  unreadInquiriesCount: 0, // Inquiries removed
+                  itemsOnHandCount,
+                  lowStockThresholdCount
                 },
-                recentOrders: ordersList.slice(0, 5),
+                recentOrders,
                 topSellingProducts: productsList.slice(0, 5),
-                reviewsCount: reviewsList.length
+                categoryDistribution: Object.keys(catDistribution).map(catName => ({
+                  category: catName,
+                  count: catDistribution[catName]
+                }))
               });
             } else if (activeTab === 'products') {
               const [prodSnap, catSnap] = await Promise.all([
@@ -1591,7 +1623,7 @@
                       {/* Top highlights grid */}
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         
-                        <div className="bg-white p-4 rounded-2xl border border-slate-150 shadow-sm text-left">
+                        <motion.div whileHover={{ y: -4, boxShadow: "0 10px 25px -5px rgba(0,0,0,0.05)" }} transition={{ duration: 0.2 }} className="bg-white p-4 rounded-2xl border border-slate-150 shadow-sm text-left">
                           <span className="block text-[9px] font-mono text-slate-400 uppercase font-black tracking-widest leading-none mb-1">
                             Lifetime Revenue
                           </span>
@@ -1601,9 +1633,9 @@
                           <span className="text-[9px] font-sans text-slate-400 mt-1 block">
                             Excludes cancelled orders
                           </span>
-                        </div>
+                        </motion.div>
 
-                        <div className="bg-white p-4 rounded-2xl border border-slate-150 shadow-sm text-left">
+                        <motion.div whileHover={{ y: -4, boxShadow: "0 10px 25px -5px rgba(0,0,0,0.05)" }} transition={{ duration: 0.2 }} className="bg-white p-4 rounded-2xl border border-slate-150 shadow-sm text-left">
                           <span className="block text-[9px] font-mono text-slate-400 uppercase font-black tracking-widest leading-none mb-1">
                             Completed Shipments
                           </span>
@@ -1613,9 +1645,9 @@
                           <span className="text-[9px] font-mono text-emerald-600 mt-1 block">
                             100% fulfill rating
                           </span>
-                        </div>
+                        </motion.div>
 
-                        <div className="bg-white p-4 rounded-2xl border border-slate-150 shadow-sm text-left">
+                        <motion.div whileHover={{ y: -4, boxShadow: "0 10px 25px -5px rgba(0,0,0,0.05)" }} transition={{ duration: 0.2 }} className="bg-white p-4 rounded-2xl border border-slate-150 shadow-sm text-left">
                           <span className="block text-[9px] font-mono text-slate-400 uppercase font-black tracking-widest leading-none mb-1 text-amber-600">
                             Low Stock Alerts
                           </span>
@@ -1625,7 +1657,7 @@
                           <span className="text-[9px] font-mono text-amber-500 mt-1 block">
                             Under 15 items remaining
                           </span>
-                        </div>
+                        </motion.div>
                       </div>
 
                       {/* Sales charts & category share visualizers */}
@@ -1726,7 +1758,7 @@
                               </thead>
                               <tbody>
                                 {analytics.recentOrders.map((o: any) => (
-                                  <tr key={o.id} className="border-b border-slate-100 font-sans hover:bg-slate-50/55 transition-colors">
+                                  <motion.tr initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} key={o.id} className="border-b border-slate-100 font-sans hover:bg-slate-50/55 transition-colors">
                                     <td className="px-3 py-3 font-mono font-black text-slate-800">{o.id}</td>
                                     <td className="px-3 py-3 font-bold text-slate-700">{o.customer}</td>
                                     <td className="px-3 py-3 text-slate-400">{new Date(o.date).toLocaleDateString()}</td>
@@ -1739,7 +1771,7 @@
                                         {o.status}
                                       </span>
                                     </td>
-                                  </tr>
+                                  </motion.tr>
                                 ))}
                               </tbody>
                             </table>
