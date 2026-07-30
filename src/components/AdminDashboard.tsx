@@ -5,6 +5,7 @@
 
   import React, { useState, useEffect } from 'react';
   import { motion } from 'motion/react';
+  import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
   import { 
     LayoutDashboard, ShoppingBag, Tags, ListOrdered, Users, CreditCard, 
     Star, MessageSquare, Settings, LogOut, Plus, Edit2, Trash2, Search, 
@@ -224,21 +225,43 @@
               const itemsOnHandCount = productsList.reduce((sum: number, p: any) => sum + (p.stock || 0), 0);
               const lowStockThresholdCount = productsList.filter((p: any) => p.stock < 15).length;
 
-              const recentOrders = ordersList
+              const recentOrders: any[] = [];
+              ordersList
                 .slice()
                 .sort((a: any, b: any) => {
                    const dA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
                    const dB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
                    return dB - dA;
                 })
-                .slice(0, 5)
-                .map((o: any) => ({
-                  id: o.id,
-                  customer: o.name || o.customerName || 'Customer',
-                  amount: Number(o.total || o.amount || 0),
-                  status: o.status,
-                  date: o.createdAt || new Date().toISOString()
-                }));
+                .slice(0, 10)
+                .forEach((o: any) => {
+                   const orderDate = new Date(o.createdAt || new Date());
+                   const yy = String(orderDate.getFullYear()).slice(-2);
+                   const mm = String(orderDate.getMonth() + 1).padStart(2, '0');
+                   const dd = String(orderDate.getDate()).padStart(2, '0');
+                   const prefix = `order_${yy}${mm}${dd}`;
+                   
+                   const items = o.items || [];
+                   if (items.length > 0) {
+                     items.forEach((item: any, idx: number) => {
+                       recentOrders.push({
+                         id: `${prefix}${String(idx + 1).padStart(3, '0')}`,
+                         customer: o.name || o.customerName || 'Customer',
+                         amount: Number(item.price || 0) * Number(item.quantity || 1),
+                         status: o.status,
+                         date: o.createdAt || new Date().toISOString()
+                       });
+                     });
+                   } else {
+                     recentOrders.push({
+                       id: o.id,
+                       customer: o.name || o.customerName || 'Customer',
+                       amount: Number(o.total || o.amount || 0),
+                       status: o.status,
+                       date: o.createdAt || new Date().toISOString()
+                     });
+                   }
+                });
 
               const catDistribution: { [key: string]: number } = {};
               productsList.forEach((p: any) => {
@@ -258,6 +281,29 @@
                   lowStockThresholdCount
                 },
                 recentOrders,
+                ordersOverTime: (() => {
+                  const monthlyTimeline: { [key: string]: number } = {};
+                  // Pre-fill last 6 months with 0
+                  for (let i = 5; i >= 0; i--) {
+                    const d = new Date();
+                    d.setMonth(d.getMonth() - i);
+                    const key = d.toLocaleString('default', { month: 'short' }) + ' ' + d.getFullYear().toString().slice(-2);
+                    monthlyTimeline[key] = 0;
+                  }
+                  ordersList.forEach((o: any) => {
+                    const date = new Date(o.createdAt || new Date());
+                    const key = date.toLocaleString('default', { month: 'short' }) + ' ' + date.getFullYear().toString().slice(-2);
+                    if (monthlyTimeline[key] !== undefined) {
+                      monthlyTimeline[key] += Number(o.total || o.amount || 0);
+                    } else {
+                      monthlyTimeline[key] = Number(o.total || o.amount || 0);
+                    }
+                  });
+                  return Object.keys(monthlyTimeline).map(month => ({
+                    period: month,
+                    revenue: monthlyTimeline[month]
+                  })).slice(-6);
+                })(),
                 topSellingProducts: productsList.slice(0, 5),
                 categoryDistribution: Object.keys(catDistribution).map(catName => ({
                   category: catName,
@@ -1658,40 +1704,95 @@
                             Under 15 items remaining
                           </span>
                         </motion.div>
+
+                        <motion.div whileHover={{ y: -4, boxShadow: "0 10px 25px -5px rgba(0,0,0,0.05)" }} transition={{ duration: 0.2 }} className="bg-white p-4 rounded-2xl border border-slate-150 shadow-sm text-left">
+                          <span className="block text-[9px] font-mono text-slate-400 uppercase font-black tracking-widest leading-none mb-1 text-blue-600">
+                            Pending Revenue
+                          </span>
+                          <div className="text-2xl font-black text-slate-800">
+                            ₹{analytics.summary?.pendingRevenue || 0}
+                          </div>
+                          <span className="text-[9px] font-mono text-blue-500 mt-1 block">
+                            In-progress orders
+                          </span>
+                        </motion.div>
+                      </div>
+
+                      {/* Quick Actions Bar */}
+                      <div className="flex flex-wrap items-center gap-3">
+                        <button 
+                          onClick={() => setActiveTab('products')} 
+                          className="flex items-center space-x-2 bg-slate-900 text-white px-4 py-2.5 rounded-xl text-xs font-sans font-bold hover:bg-slate-800 transition-colors shadow-sm cursor-pointer"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span>Add New Product</span>
+                        </button>
+                        <button 
+                          onClick={() => setActiveTab('orders')} 
+                          className="flex items-center space-x-2 bg-white text-slate-700 border border-slate-200 px-4 py-2.5 rounded-xl text-xs font-sans font-bold hover:bg-slate-50 transition-colors shadow-sm cursor-pointer"
+                        >
+                          <ListOrdered className="w-4 h-4 text-slate-400" />
+                          <span>View Pending Orders</span>
+                        </button>
+                        <button 
+                          onClick={() => setActiveTab('coupons')} 
+                          className="flex items-center space-x-2 bg-white text-slate-700 border border-slate-200 px-4 py-2.5 rounded-xl text-xs font-sans font-bold hover:bg-slate-50 transition-colors shadow-sm cursor-pointer"
+                        >
+                          <Tag className="w-4 h-4 text-slate-400" />
+                          <span>Manage Coupons</span>
+                        </button>
                       </div>
 
                       {/* Sales charts & category share visualizers */}
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        
-                        {/* Simulated elegant pure-CSS monthly graph */}
+                        {/* Recharts Monthly Graph */}
                         <div className="bg-white p-5 rounded-2xl border border-slate-150 shadow-sm text-left">
                           <h3 className="text-xs font-mono font-black uppercase tracking-wider text-slate-700 mb-4">
                             Sales Progression over time
                           </h3>
                           {analytics.ordersOverTime?.length > 0 ? (
-                            <div className="h-44 flex items-end justify-between space-x-2 pt-4">
-                              {analytics.ordersOverTime.map((item: any, idx: number) => {
-                                const maxVal = Math.max(...analytics.ordersOverTime.map((o: any) => o.revenue), 1);
-                                const heightPct = Math.round((item.revenue / maxVal) * 80) + 10;
-                                return (
-                                  <div key={idx} className="flex-1 flex flex-col items-center">
-                                    <span className="text-[8px] font-mono text-slate-500 mb-1 leading-none">₹{item.revenue}</span>
-                                    <div 
-                                      style={{ height: `${heightPct}px` }} 
-                                      className="w-full rounded-t-lg bg-gradient-to-t from-[#A61B1B] to-rose-400 group relative cursor-pointer hover:opacity-90"
-                                    >
-                                      {/* Tooltip */}
-                                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-slate-900 text-white text-[8px] rounded p-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                                        Revenue: ₹{item.revenue}
-                                      </div>
-                                    </div>
-                                    <span className="text-[9px] font-mono text-slate-400 mt-1.5 leading-none">{item.period}</span>
-                                  </div>
-                                );
-                              })}
+                            <div className="h-56 w-full pt-4">
+                              <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={analytics.ordersOverTime} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                                  <defs>
+                                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                                      <stop offset="5%" stopColor="#A61B1B" stopOpacity={0.3}/>
+                                      <stop offset="95%" stopColor="#A61B1B" stopOpacity={0}/>
+                                    </linearGradient>
+                                  </defs>
+                                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                  <XAxis 
+                                    dataKey="period" 
+                                    axisLine={false} 
+                                    tickLine={false} 
+                                    tick={{ fontSize: 10, fontFamily: 'monospace', fill: '#94a3b8' }} 
+                                    dy={10}
+                                  />
+                                  <YAxis 
+                                    axisLine={false} 
+                                    tickLine={false} 
+                                    tick={{ fontSize: 10, fontFamily: 'monospace', fill: '#94a3b8' }} 
+                                    tickFormatter={(val) => `₹${val}`}
+                                  />
+                                  <RechartsTooltip 
+                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', fontSize: '12px' }}
+                                    formatter={(value) => [`₹${value}`, 'Revenue']}
+                                    labelStyle={{ fontWeight: 'bold', color: '#1e293b', marginBottom: '4px' }}
+                                  />
+                                  <Area 
+                                    type="monotone" 
+                                    dataKey="revenue" 
+                                    stroke="#A61B1B" 
+                                    strokeWidth={3}
+                                    fillOpacity={1} 
+                                    fill="url(#colorRevenue)" 
+                                    activeDot={{ r: 6, fill: '#A61B1B', stroke: '#fff', strokeWidth: 2 }}
+                                  />
+                                </AreaChart>
+                              </ResponsiveContainer>
                             </div>
                           ) : (
-                            <div className="h-44 flex items-center justify-center text-slate-400 text-xs font-mono">
+                            <div className="h-56 flex items-center justify-center text-slate-400 text-xs font-mono">
                               No sales data registered yet to generate visual trends.
                             </div>
                           )}
@@ -1735,58 +1836,78 @@
                               Top product counts will compute automatically based on orders placed.
                             </div>
                           )}
+                                              </div>
+
+                      {/* Bottom Row: Recent Orders & Recent Reviews */}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                        
+                        {/* Recent Orders Snippet */}
+                        <div className="bg-white p-5 rounded-2xl border border-slate-150 shadow-sm text-left flex flex-col h-full">
+                          <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-xs font-mono font-black uppercase tracking-wider text-slate-700">
+                              🕒 Latest Transaction Queue
+                            </h3>
+                            <button onClick={() => setActiveTab('orders')} className="text-[10px] font-bold text-[#A61B1B] hover:underline cursor-pointer transition-opacity hover:opacity-80">
+                              View All
+                            </button>
+                          </div>
+                          
+                          {analytics.recentOrders?.length > 0 ? (
+                            <div className="space-y-3 flex-1 overflow-y-auto pr-1 h-[22rem]">
+                              {analytics.recentOrders.map((o: any) => (
+                                <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} key={o.id} className="flex flex-col p-3 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 transition-colors shadow-sm">
+                                  <div className="flex justify-between items-start mb-1.5">
+                                    <span className="text-[10px] font-mono font-black text-slate-800 uppercase line-clamp-1">{o.id}</span>
+                                    <span className={`inline-block px-1.5 py-0.5 rounded text-[8px] font-mono font-bold uppercase ${
+                                        o.status === 'Delivered' ? 'bg-emerald-100 text-emerald-800' :
+                                        o.status === 'Cancelled' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'
+                                      }`}>
+                                      {o.status}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-end">
+                                    <span className="text-xs font-bold text-slate-700 line-clamp-1 pr-2">{o.customer}</span>
+                                    <span className="text-xs font-mono font-black text-slate-900 whitespace-nowrap">₹{o.amount}</span>
+                                  </div>
+                                  <span className="text-[9px] font-sans text-slate-400 mt-1">{new Date(o.date).toLocaleDateString()}</span>
+                                </motion.div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="flex-1 flex items-center justify-center text-slate-400 text-xs font-mono h-32">
+                              No recent orders found.
+                            </div>
+                          )}
                         </div>
 
-                      </div>
-
-                      {/* Recent Orders List */}
-                      <div className="bg-white p-5 rounded-2xl border border-slate-150 shadow-sm text-left">
-                        <h3 className="text-xs font-mono font-black uppercase tracking-wider text-slate-700 mb-4">
-                          🕒 Latest Transaction Queue
-                        </h3>
-                        {analytics.recentOrders?.length > 0 ? (
-                          <div className="overflow-x-auto">
-                            <table className="w-full text-xs text-left text-slate-500">
-                              <thead className="text-[10px] uppercase font-mono text-slate-400 bg-slate-50 rounded-lg">
-                                <tr>
-                                  <th className="px-3 py-2.5">Order ID</th>
-                                  <th className="px-3 py-2.5">Recipient</th>
-                                  <th className="px-3 py-2.5">Placed Date</th>
-                                  <th className="px-3 py-2.5 text-right">Amount</th>
-                                  <th className="px-3 py-2.5 text-center">Status</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {analytics.recentOrders.map((o: any) => (
-                                  <motion.tr initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} key={o.id} className="border-b border-slate-100 font-sans hover:bg-slate-50/55 transition-colors">
-                                    <td className="px-3 py-3 font-mono font-black text-slate-800">{o.id}</td>
-                                    <td className="px-3 py-3 font-bold text-slate-700">{o.customer}</td>
-                                    <td className="px-3 py-3 text-slate-400">{new Date(o.date).toLocaleDateString()}</td>
-                                    <td className="px-3 py-3 text-right font-mono font-black text-slate-850">₹{o.amount}</td>
-                                    <td className="px-3 py-3 text-center">
-                                      <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase ${
-                                        o.status === 'Delivered' ? 'bg-emerald-100 text-emerald-800' :
-                                        o.status === 'Cancelled' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-855'
-                                      }`}>
-                                        {o.status}
-                                      </span>
-                                    </td>
-                                  </motion.tr>
-                                ))}
-                              </tbody>
-                            </table>
+                        {/* Recent Reviews Snippet */}
+                        <div className="bg-white p-5 rounded-2xl border border-slate-150 shadow-sm text-left flex flex-col h-full">
+                          <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-xs font-mono font-black uppercase tracking-wider text-slate-700">
+                              💬 Recent Feedback
+                            </h3>
+                            <button onClick={() => setActiveTab('reviews')} className="text-[10px] font-bold text-[#A61B1B] hover:underline cursor-pointer transition-opacity hover:opacity-80">
+                              View All
+                            </button>
                           </div>
-                        ) : (
-                          <p className="text-slate-450 text-xs font-mono text-center py-6">
-                            Waiting for live customer checkout transactions to log logs.
-                          </p>
-                        )}
-                      </div>
+                          
+                          <div className="flex-1 flex flex-col justify-center items-center text-slate-400 text-xs font-mono space-y-3 h-[22rem]">
+                            <div className="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center">
+                              <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+                            </div>
+                            <span>
+                              {analytics.summary?.totalApprovedReviewsCount || 0} Total Reviews
+                            </span>
+                            <span className="text-[10px] text-slate-500 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">
+                              {analytics.summary?.pendingReviewsCount || 0} Pending Moderation
+                            </span>
+                          </div>
+                        </div>
 
+                        </div>
+                      </div>
                     </div>
                   )}
-
-
                   {/* ========================================== */}
                   {/* 2. PRODUCTS MODULE (STEP 5)                */}
                   {/* ========================================== */}
@@ -1943,14 +2064,11 @@
                                 ))}
                             </tbody>
                           </table>
-                        </div>
+                                              </div>
 
                       </div>
-
                     </div>
                   )}
-
-
                   {/* ========================================== */}
                   {/* 3. CATEGORIES MODULE (STEP 6)             */}
                   {/* ========================================== */}
