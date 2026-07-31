@@ -43,7 +43,7 @@ export default function RecipeSection({ recipesList = RECIPES }: RecipeSectionPr
         </div>
 
         {/* Recipe Grid cards display */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-8 scroll-smooth no-scrollbar">
           {recipesList.map((recipe, idx) => (
             <motion.div
               key={recipe.id}
@@ -51,7 +51,7 @@ export default function RecipeSection({ recipesList = RECIPES }: RecipeSectionPr
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: idx * 0.15 }}
               onClick={() => setSelectedRecipe(recipe)}
-              className="relative group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl border border-gray-100 flex flex-col justify-between cursor-pointer h-[460px] transform transition-transform"
+              className="relative group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl border border-gray-100 flex flex-col justify-between cursor-pointer h-[460px] transform transition-transform flex-shrink-0 w-[90vw] md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] snap-center sm:snap-start"
             >
               {/* Photo top section with hover preview reveal */}
               <div className="relative h-60 overflow-hidden shrink-0">
