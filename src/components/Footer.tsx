@@ -48,7 +48,7 @@ export default function Footer({ onNavigate, onOpenAdmin }: FooterProps) {
                   <img
                     src="https://ik.imagekit.io/9f6w6a0wf/logo.png.png"
                     alt="Geeta's Logo"
-                    className="h-8 sm:h-9 w-auto object-contain transition-all hover:scale-[1.05]"
+                    className="h-16 sm:h-20 w-auto object-contain transition-all hover:scale-[1.05]"
                     onError={() => setLogoError(true)}
                     referrerPolicy="no-referrer"
                   />

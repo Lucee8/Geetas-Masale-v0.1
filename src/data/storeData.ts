@@ -4,10 +4,10 @@
  */
 
 import { Product, Recipe, Testimonial, GalleryItem } from '../types';
-import malvaniSundayMasala from '../assets/images/Masale/malvani spl Sunday masala.webP';
+import malvaniSundayMasala from '../assets/images/Masale/malvani-spl-sunday-masala.webp';
 import frymasala from '../assets/images/Masale/Malvani fish fry masala.webP';
 import Biryanimasala from '../assets/images/Masale/Biryani masala.webP';
-import Kashmirimirchi from '../assets/images/Masale/Kashmiri mirchi powder.webP';
+import Kashmirimirchi from '../assets/images/Masale/Kashmiri mirchi powder copy.webP';
 import specialbhajka from '../assets/images/Masale/Malvani special bhajka masala.webP';
 import muttonmasala from '../assets/images/Masale/malvani special mutton masala.webP';
 import currymasala from '../assets/images/Masale/malvani fish curry masala.webP';
@@ -36,20 +36,20 @@ import Khadkhadeladdoo from '../assets/images/Laddoos/Khadkhade laddoo.webP';
 import Kadakbundiladdoo from '../assets/images/Laddoos/Kadak bundi laddoo.webP';
 import Shevladdoo from '../assets/images/Laddoos/Shev laddoo.webP';
 import Shengdanaladdoo from '../assets/images/Laddoos/Shengdana laddoo.webP';
-import polishkaju2 from '../assets/images/Kaju/polish kaju 2 (big size).webP';
-import Salwalekaju2 from '../assets/images/Kaju/Salwale kaju 2 (big size).webP';
-import Salwalekaju4 from '../assets/images/Kaju/Salwale kaju 4 (medium size).webP';
+import polishkaju2 from '../assets/images/Kaju/polish kaju (big size).webP';
+import Salwalekaju2 from '../assets/images/Kaju/Salwale kaju (big size).webP';
+import Salwalekaju4 from '../assets/images/Kaju/Salwale kaju (medium size).webP';
 import Saltedkaju from '../assets/images/Kaju/Salted kaju.webP';
 import Masalakaju from '../assets/images/Kaju/Masala kaju.webP';
 import Tukdakaju from '../assets/images/Kaju/Tukda kaju.webP';
-import polishkaju4 from '../assets/images/Kaju/polish kaju 4 (medium size).webP';
+import polishkaju4 from '../assets/images/Kaju/polish kaju (medium size).webP';
 
 // Static assets for categories, gallery, and recipes to ensure Vite bundles them successfully in production
-import cookingImage from '../assets/images/categories/Traditional Flours.webP';
-import storefrontImage from '../assets/images/categories/meva.png';
-import interiorImage from '../assets/images/categories/Handmade Laddoos.webP';
-import masalaHeroImage from '../assets/images/categories/Malvani Masalas & Chutneys.webP';
-import cashewPremiumImage from '../assets/images/Kaju/Polish kaju 3 (medium size).webP';
+import cookingImage from '../assets/images/malvani_cooking_1780594653286.png';
+import storefrontImage from '../assets/images/geetas_storefront_1780594715235.png';
+import interiorImage from '../assets/images/geetas_interior_1780594732720.png';
+import masalaHeroImage from '../assets/images/masala_hero_1780594616996.png';
+import cashewPremiumImage from '../assets/images/cashew_premium_1780594672474.png';
 
 export const CATEGORIES = [
   {
@@ -84,7 +84,7 @@ export const CATEGORIES = [
     id: 'Kaju',
     name: 'Premium Malvan Cashews (Kaju)',
     description: 'Export-grade whole cashews, salted variants, masala-flavored crunch, and healthy split kernels.',
-    image: "https://m.media-amazon.com/images/I/51zztW0aVEL.jpg",
+    image: cashewPremiumImage,
     count: 7
   }
 ];
@@ -826,32 +826,21 @@ export function resolveProductImage(p: Product | null | undefined): string {
   return p.image || '';
 }
 
-/**
- * Resolve the image for a category loaded from local data, Firebase, or the API.
- * Local assets are used for the built-in categories so Vite includes them in the
- * production bundle. Custom category images are used when no local match exists.
- */
-export function resolveCategoryImage(
-  category: { id?: string; image?: string } | string | null | undefined,
-): string {
-  if (!category) return '';
-
-  const categoryId = typeof category === 'string' ? category : category.id || '';
-  const normalizedId = categoryId.trim().toLowerCase();
-
-  const localCategoryImages: Record<string, string> = {
-    masale: masalaHeroImage,
-    masala: masalaHeroImage,
-    pith: cookingImage,
-    'malvani products': storefrontImage,
-    'malvani product': storefrontImage,
-    malvani: storefrontImage,
-    laddoos: interiorImage,
-    laddoo: interiorImage,
-    kaju: cashewPremiumImage,
-  };
-
-  return localCategoryImages[normalizedId]
-    || (typeof category === 'string' ? '' : category.image || '');
+export function resolveCategoryImage(c: any): string {
+  if (!c) return '';
+  
+  // If user uploaded a base64 or external url via admin dashboard, that should override the static asset if they explicitly modified it.
+  // Wait, if it's the exact default string like '/src/assets...', we should fall back to local asset.
+  if (c.image && !c.image.startsWith('/src/assets')) {
+    return c.image;
+  }
+  
+  const localCategory = CATEGORIES.find(item => item.id === c.id);
+  if (localCategory && localCategory.image) {
+    return localCategory.image;
+  }
+  
+  return c.image || '';
 }
+
 

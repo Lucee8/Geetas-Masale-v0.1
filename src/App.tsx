@@ -14,7 +14,6 @@ import Heritage from './components/Heritage';
 import RecipeSection from './components/RecipeSection';
 import WhyChooseUs from './components/WhyChooseUs';
 import Reviews from './components/Reviews';
-import Gallery from './components/Gallery';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import InquiryDrawer from './components/InquiryDrawer';
@@ -351,7 +350,6 @@ export default function App() {
 
       <Reviews />
 
-      <Gallery />
 
       <Contact />
 

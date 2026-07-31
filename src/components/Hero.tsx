@@ -67,14 +67,6 @@ export default function Hero({ onExploreClick, onWhatsAppClick, onSelectCategory
                 HANDMADE AUTHENTIC <br className="hidden sm:inline" />
                 <span className="text-[#A61B1B]">MALVANI MASALAS</span> & <span className="text-slate-500">PURE KONKANI MEVA</span>
               </motion.h1>
-
-              {/* Minimal Warm Description */}
-              <motion.p 
-                variants={itemVariants}
-                className="text-slate-600 text-sm sm:text-base font-normal font-sans max-w-xl sm:max-w-2xl mx-auto leading-relaxed"
-              >
-                From the stove of Sri Geeta’s coastal kitchen, we hand-roast original Sunday griddle spices, mill natural healthy grain flours (Pith), and pack export-grade coastal cashews. No artificial preservatives, colors, or heavy synthetic starches. Just pure Konkan culinary spirit.
-              </motion.p>
             </div>
           </motion.div>
         </div>
@@ -86,9 +78,6 @@ export default function Hero({ onExploreClick, onWhatsAppClick, onSelectCategory
           
           {/* Categories Title block */}
           <div className="text-center max-w-3xl mx-auto space-y-2">
-            <span className="text-[9px] font-mono tracking-[0.4em] font-black text-[#A61B1B] uppercase block">
-              OUR DEPARTMENTS
-            </span>
             <h2 className="font-sans text-xl sm:text-2xl md:text-3xl font-black tracking-tight uppercase text-slate-900">
               Signature <span className="text-[#A61B1B]">Store Categories</span>
             </h2>

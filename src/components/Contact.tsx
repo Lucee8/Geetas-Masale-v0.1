@@ -125,9 +125,9 @@ Please get back to me with terms and details. Thank you!`;
                   <div>
                     <h4 className="font-sans font-bold text-sm uppercase text-slate-800 tracking-wider">Store Location Address</h4>
                     <p className="text-sm text-gray-500 mt-1 leading-relaxed">
-                      Kasal - Malvan Rd, Near Petrol Pump,<br />
-                      Dewoolwada, Malvan,<br />
-                      Maharashtra 416606
+                      Geetas masale, Malvan -kasal Rd,<br />
+                      near Shrinivas PETROL PUMP,<br />
+                      Dewoolwada, Malvan, Maharashtra 416606
                     </p>
                   </div>
                 </div>
@@ -188,7 +188,7 @@ Please get back to me with terms and details. Thank you!`;
               </a>
 
               <a
-                href="https://maps.google.com/?q=Kasal+-+Malvan+Rd,+Near+Petrol+Pump,+Dewoolwada,+Malvan,+Maharashtra+416606"
+                href="https://maps.google.com/?q=Geetas+masale,+Malvan+-kasal+Rd,+near+Shrinivas+PETROL+PUMP,+Dewoolwada,+Malvan,+Maharashtra+416606"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center space-x-2 py-3.5 rounded-xl bg-transparent border border-slate-200 hover:border-slate-400 text-slate-700 font-sans text-xs font-bold tracking-wider uppercase transition-all"
@@ -208,7 +208,7 @@ Please get back to me with terms and details. Thank you!`;
                 {/* Elegant real embedded map pointing directly to Kasal Malvan Rd Maharashtra */}
                 <iframe
                   title="Geeta's Masale Google Map"
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3821.5791781255554!2d73.689!3d16.14!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc007e0e0e00001%3A0xe0e0e0e0e0e0e0e0!2sKasal%2C%20Maharashtra%20416606!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3644.458535368554!2d73.479061!3d16.0566618!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc0039d343d37b9%3A0x121c449423322376!2sGEETA'S%20MASALE!5e1!3m2!1sen!2sin!4v1785488394406!5m2!1sen!2sin"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}

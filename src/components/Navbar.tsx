@@ -46,7 +46,6 @@
       { id: 'products', name: 'Our Products' },
       { id: 'heritage', name: 'Konkan Heritage' },
       { id: 'recipes', name: 'Recipes' },
-      { id: 'gallery', name: 'Gallery' },
       { id: 'contact', name: 'Contact' },
     ];
 
@@ -78,7 +77,7 @@
                   src="https://ik.imagekit.io/9f6w6a0wf/logo.png.png"
                   alt="Geeta's Logo"
                   className={`object-contain transition-all duration-305 hover:scale-[1.05] ${
-                    isScrolled ? 'h-8 sm:h-10' : 'h-10 sm:h-12'
+                    isScrolled ? 'h-12 sm:h-16' : 'h-16 sm:h-24'
                   }`}
                   onError={() => setLogoError(true)}
                   referrerPolicy="no-referrer"
