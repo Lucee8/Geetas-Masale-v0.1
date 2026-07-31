@@ -156,25 +156,7 @@ Please confirm availability and sharing banking details for packing. Thanks!`;
 
         {/* Categories are handled elegantly via the 3D category cards in the Hero section above */}
 
-        {/* Category Filter Tabs */}
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-10">
-          {filterTabs.map((tab) => {
-            const isActive = selectedCategory.toLowerCase() === tab.id.toLowerCase();
-            return (
-              <button
-                key={tab.id}
-                onClick={() => onSelectCategory(tab.id)}
-                className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold uppercase transition-all duration-300 shadow-sm border ${
-                  isActive
-                    ? 'bg-[#A61B1B] text-white border-[#A61B1B] scale-105'
-                    : 'bg-white text-slate-600 border-gray-200 hover:border-[#A61B1B] hover:text-[#A61B1B]'
-                }`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
+
 
         {/* Empty Search State fallback */}
         {filteredProducts.length === 0 && (
