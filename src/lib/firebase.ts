@@ -59,10 +59,7 @@ if (typeof window !== 'undefined') {
 
 export const isVercel = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
 
-export const isProduction = typeof window !== 'undefined' && (
-  window.location.hostname.includes('onrender.com') ||
-  window.location.hostname.includes('vercel.app')
-);
+export const isProduction = typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
 
 let app;
 export let auth: any = null;
