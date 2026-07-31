@@ -6,15 +6,16 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { MoveRight } from 'lucide-react';
-import { CATEGORIES } from '../data/storeData';
+import { resolveCategoryImage } from '../data/storeData';
 
 interface HeroProps {
   onExploreClick: () => void;
   onWhatsAppClick: () => void;
   onSelectCategory: (categoryId: string) => void;
+  categoriesList?: any[];
 }
 
-export default function Hero({ onExploreClick, onWhatsAppClick, onSelectCategory }: HeroProps) {
+export default function Hero({ onExploreClick, onWhatsAppClick, onSelectCategory, categoriesList = [] }: HeroProps) {
   // Stagger wrapper settings for clean visual entrance
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -99,7 +100,7 @@ export default function Hero({ onExploreClick, onWhatsAppClick, onSelectCategory
 
           {/* Minimal 2-Column Mobile & 5-Column Desktop Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-6 pt-2">
-            {CATEGORIES.map((cat, idx) => (
+            {categoriesList.map((cat, idx) => (
               <motion.div
                 key={cat.id}
                 initial={{ opacity: 0, y: 15 }}
@@ -116,7 +117,7 @@ export default function Hero({ onExploreClick, onWhatsAppClick, onSelectCategory
                 {/* Backdrop image */}
                 <div className="absolute inset-0 z-0">
                   <img
-                    src={cat.image}
+                    src={resolveCategoryImage(cat) || 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&auto=format&fit=crop&q=80'}
                     alt={cat.name}
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                     referrerPolicy="no-referrer"

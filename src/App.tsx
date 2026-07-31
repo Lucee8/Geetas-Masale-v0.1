@@ -329,6 +329,7 @@ export default function App() {
         onExploreClick={() => handleScrollToSection('products')}
         onWhatsAppClick={handleWhatsAppGeneralClick}
         onSelectCategory={handleCategorySelection}
+        categoriesList={categoriesList}
       />
 
       <ProductSection

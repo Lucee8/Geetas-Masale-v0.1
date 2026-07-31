@@ -826,3 +826,32 @@ export function resolveProductImage(p: Product | null | undefined): string {
   return p.image || '';
 }
 
+/**
+ * Resolve the image for a category loaded from local data, Firebase, or the API.
+ * Local assets are used for the built-in categories so Vite includes them in the
+ * production bundle. Custom category images are used when no local match exists.
+ */
+export function resolveCategoryImage(
+  category: { id?: string; image?: string } | string | null | undefined,
+): string {
+  if (!category) return '';
+
+  const categoryId = typeof category === 'string' ? category : category.id || '';
+  const normalizedId = categoryId.trim().toLowerCase();
+
+  const localCategoryImages: Record<string, string> = {
+    masale: masalaHeroImage,
+    masala: masalaHeroImage,
+    pith: cookingImage,
+    'malvani products': storefrontImage,
+    'malvani product': storefrontImage,
+    malvani: storefrontImage,
+    laddoos: interiorImage,
+    laddoo: interiorImage,
+    kaju: cashewPremiumImage,
+  };
+
+  return localCategoryImages[normalizedId]
+    || (typeof category === 'string' ? '' : category.image || '');
+}
+

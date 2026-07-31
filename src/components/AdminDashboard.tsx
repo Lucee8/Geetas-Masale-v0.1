@@ -32,7 +32,7 @@
     signOut,
     onAuthStateChanged
   } from 'firebase/auth';
-  import { PRODUCTS, CATEGORIES, resolveProductImage } from '../data/storeData';
+  import { PRODUCTS, CATEGORIES, resolveProductImage, resolveCategoryImage } from '../data/storeData';
 
   interface AdminDashboardProps {
     onClose: () => void;
@@ -2107,7 +2107,7 @@
                                 <td className="px-4 py-3">
                                   <div className="flex items-center space-x-3 font-sans text-left">
                                     <img
-                                      src={c.image || 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&auto=format&fit=crop&q=80'}
+                                      src={resolveCategoryImage(c) || 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&auto=format&fit=crop&q=80'}
                                       alt={c.name}
                                       className="w-12 h-12 rounded-lg object-cover border border-slate-200 shrink-0"
                                     />
