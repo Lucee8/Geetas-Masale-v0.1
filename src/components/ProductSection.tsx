@@ -56,13 +56,13 @@ export default function ProductSection({
     // Category filter
     if (selectedCategory && selectedCategory !== 'all') {
       result = result.filter(
-        (p) => (p.category || '').toLowerCase() === selectedCategory.toLowerCase()
+        (p) => (p.category || '').trim().toLowerCase() === (selectedCategory || '').trim().toLowerCase()
       );
     }
 
     // Search query
     if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
+      const q = searchQuery.trim().toLowerCase();
       result = result.filter(
         (p) =>
           (p.name || '').toLowerCase().includes(q) ||
@@ -82,7 +82,7 @@ export default function ProductSection({
     }
 
     return result;
-  }, [selectedCategory, searchQuery, sortBy]);
+  }, [selectedCategory, searchQuery, sortBy, productsList]);
 
   
   // Calculate dynamic header based on selected category
@@ -186,7 +186,7 @@ Please confirm availability and sharing banking details for packing. Thanks!`;
             <span className="text-5xl block mb-4">🥣</span>
             <h3 className="text-xl font-bold uppercase text-slate-800">No Spicy Products Found</h3>
             <p className="text-gray-500 text-sm mt-2 max-w-sm mx-auto font-sans leading-relaxed">
-              We couldn't locate any products matching "{searchQuery}". Try selecting a general category or entering generic terms like "kaju" or "masala".
+              We couldn't locate any products matching {searchQuery ? `"${searchQuery}"` : `category "${activeCategoryName || selectedCategory}"`}.
             </p>
             <button
               onClick={() => {
