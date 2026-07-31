@@ -51,32 +51,15 @@ export default function ProductSection({
 
   // Process sorting & filtering
   const filteredProducts = useMemo(() => {
-    console.log("Filtering products:", { selectedCategory, searchQuery, sortBy, productsCount: productsList?.length });
     let result = productsList && productsList.length > 0 ? [...productsList] : [...PRODUCTS];
 
-    
     // Category filter
     if (selectedCategory && selectedCategory !== 'all') {
-      const selectedCatObj = categoriesList?.find(c => c.id.toLowerCase() === selectedCategory.toLowerCase());
-      
       result = result.filter(
-        (p) => {
-          const pCat = (p.category || '').toLowerCase();
-          const sCat = selectedCategory.toLowerCase();
-          
-          if (pCat === sCat) return true;
-          
-          // Cross-reference fallback categories by name
-          if (selectedCatObj) {
-            const fallbackCat = CATEGORIES.find(c => c.name === selectedCatObj.name);
-            if (fallbackCat && fallbackCat.id.toLowerCase() === pCat) {
-              return true;
-            }
-          }
-          return false;
-        }
+        (p) => (p.category || '').toLowerCase() === selectedCategory.toLowerCase()
       );
     }
+
     // Search query
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -98,9 +81,8 @@ export default function ProductSection({
       result.sort((a, b) => a.name.localeCompare(b.name));
     }
 
-    console.log("Filtered result count:", result.length);
     return result;
-  }, [selectedCategory, searchQuery, sortBy, productsList, categoriesList]);
+  }, [selectedCategory, searchQuery, sortBy]);
 
   
   // Calculate dynamic header based on selected category
@@ -184,7 +166,7 @@ Please confirm availability and sharing banking details for packing. Thanks!`;
             <span className="text-5xl block mb-4">🥣</span>
             <h3 className="text-xl font-bold uppercase text-slate-800">No Spicy Products Found</h3>
             <p className="text-gray-500 text-sm mt-2 max-w-sm mx-auto font-sans leading-relaxed">
-              DEBUG: selectedCategory: {selectedCategory} | productsList length: {productsList?.length} | result length before filter: {productsList && productsList.length > 0 ? productsList.length : PRODUCTS.length} | first product category: {productsList && productsList.length > 0 ? productsList[0].category : PRODUCTS[0].category} . We couldn't locate any products...
+              We couldn't locate any products matching "{searchQuery}". Try selecting a general category or entering generic terms like "kaju" or "masala".
             </p>
             <button
               onClick={() => {
