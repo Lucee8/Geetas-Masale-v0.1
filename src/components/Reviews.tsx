@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Star, X, MessageSquare, ChevronLeft, ChevronRight, User } from 'lucide-react';
-import { TESTIMONIALS } from '../data/storeData';
+import { TESTIMONIALS, STORE_CONFIG } from '../data/storeData';
 import { isFirebaseConfigured, db, isVercel } from '../lib/firebase';
 import { collection, doc, setDoc, getDocs } from 'firebase/firestore';
 
@@ -276,12 +276,14 @@ export default function Reviews() {
 
               {/* Slider Controls Arrows + Post CTA */}
               <div className="flex items-center space-x-4">
-                <button
-                  onClick={() => setShowFormModal(true)}
-                  className="px-4 py-2 rounded-xl bg-[#A61B1B] text-white hover:bg-red-800 text-xs font-mono font-bold tracking-widest uppercase transition-all shadow-[0_4px_12px_rgba(166,27,27,0.15)] cursor-pointer"
+                <a
+                  href={STORE_CONFIG.googleReviewUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 rounded-xl bg-[#A61B1B] text-white hover:bg-red-800 text-xs font-mono font-bold tracking-widest uppercase transition-all shadow-[0_4px_12px_rgba(166,27,27,0.15)] cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#A61B1B] focus:ring-offset-2"
                 >
                   Write Review
-                </button>
+                </a>
                 <div className="flex space-x-2">
                   <button
                     onClick={handlePrev}
