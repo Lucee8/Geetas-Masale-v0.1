@@ -169,8 +169,8 @@ Please get back to me with terms and details. Thank you!`;
                   </div>
                   <div>
                     <h4 className="font-sans font-bold text-sm uppercase text-slate-800 tracking-wider">Email Inquiry</h4>
-                    <a href="mailto:bhaveshkoyande8@gmail.com" className="text-sm text-gray-500 mt-1 hover:underline block">
-                      bhaveshkoyande8@gmail.com
+                    <a href="mailto:geetasmasale@gmail.com" className="text-sm text-gray-500 mt-1 hover:underline block">
+                      geetasmasale@gmail.com
                     </a>
                   </div>
                 </div>
@@ -231,7 +231,7 @@ Please get back to me with terms and details. Thank you!`;
                     <input
                       type="text"
                       required
-                      placeholder="e.g. Bhavesh Koyande"
+                      placeholder="Enter your full name"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="w-full bg-slate-50 text-xs px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#A61B1B]"
@@ -244,7 +244,7 @@ Please get back to me with terms and details. Thank you!`;
                     <input
                       type="tel"
                       required
-                      placeholder="e.g. +91 98765 43210"
+                      placeholder="+91 XXXXX XXXXX"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       className="w-full bg-slate-50 text-xs px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#A61B1B]"
