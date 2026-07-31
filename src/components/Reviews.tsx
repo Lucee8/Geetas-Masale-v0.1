@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Star, X, MessageSquare, ChevronLeft, ChevronRight, User } from 'lucide-react';
+import { Star, X, MessageSquare, ChevronLeft, ChevronRight, User, MapPin, Edit2, CheckCircle2, BadgeCheck } from 'lucide-react';
 import { TESTIMONIALS, STORE_CONFIG } from '../data/storeData';
 import { isFirebaseConfigured, db, isVercel } from '../lib/firebase';
 import { collection, doc, setDoc, getDocs } from 'firebase/firestore';
@@ -33,9 +33,9 @@ export default function Reviews() {
           // Filter to only approved reviews on client-side or use all if empty
           const approved = docs.filter((r: any) => r.approved !== false);
           if (approved.length > 0) {
-            setReviews(approved);
+            setReviews([...TESTIMONIALS, ...approved.map((r: any) => ({...r, review: r.comment || r.review, rating: r.ratingValue || r.rating}))]);
           } else if (docs.length > 0) {
-            setReviews(docs);
+            setReviews([...TESTIMONIALS, ...docs.map((r: any) => ({...r, review: r.comment || r.review, rating: r.ratingValue || r.rating}))]);
           }
         })
         .catch(err => {
@@ -49,7 +49,7 @@ export default function Reviews() {
         })
         .then(data => {
           if (data && data.length > 0) {
-            setReviews(data);
+            setReviews([...TESTIMONIALS, ...data.map((r: any) => ({...r, review: r.comment || r.review, rating: r.ratingValue || r.rating}))]);
           }
         })
         .catch(err => {

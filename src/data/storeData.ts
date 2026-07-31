@@ -4,10 +4,10 @@
  */
 
 import { Product, Recipe, Testimonial, GalleryItem } from '../types';
-import malvaniSundayMasala from '../assets/images/Masale/malvani spl Sunday masala.webP';
+import malvaniSundayMasala from '../assets/images/Masale/malvani-spl-sunday-masala.webp';
 import frymasala from '../assets/images/Masale/Malvani fish fry masala.webP';
 import Biryanimasala from '../assets/images/Masale/Biryani masala.webP';
-import Kashmirimirchi from '../assets/images/Masale/Kashmiri mirchi powder.webP';
+import Kashmirimirchi from '../assets/images/Masale/Kashmiri mirchi powder copy.webP';
 import specialbhajka from '../assets/images/Masale/Malvani special bhajka masala.webP';
 import muttonmasala from '../assets/images/Masale/malvani special mutton masala.webP';
 import currymasala from '../assets/images/Masale/malvani fish curry masala.webP';
@@ -36,20 +36,20 @@ import Khadkhadeladdoo from '../assets/images/Laddoos/Khadkhade laddoo.webP';
 import Kadakbundiladdoo from '../assets/images/Laddoos/Kadak bundi laddoo.webP';
 import Shevladdoo from '../assets/images/Laddoos/Shev laddoo.webP';
 import Shengdanaladdoo from '../assets/images/Laddoos/Shengdana laddoo.webP';
-import polishkaju2 from '../assets/images/Kaju/polish kaju 2 (big size).webP';
-import Salwalekaju2 from '../assets/images/Kaju/Salwale kaju 2 (big size).webP';
-import Salwalekaju4 from '../assets/images/Kaju/Salwale kaju 4 (medium size).webP';
+import polishkaju2 from '../assets/images/Kaju/polish kaju (big size).webP';
+import Salwalekaju2 from '../assets/images/Kaju/Salwale kaju (big size).webP';
+import Salwalekaju4 from '../assets/images/Kaju/Salwale kaju (medium size).webP';
 import Saltedkaju from '../assets/images/Kaju/Salted kaju.webP';
 import Masalakaju from '../assets/images/Kaju/Masala kaju.webP';
 import Tukdakaju from '../assets/images/Kaju/Tukda kaju.webP';
-import polishkaju4 from '../assets/images/Kaju/polish kaju 4 (medium size).webP';
+import polishkaju4 from '../assets/images/Kaju/polish kaju (medium size).webP';
 
 // Static assets for categories, gallery, and recipes to ensure Vite bundles them successfully in production
-import cookingImage from '../assets/images/categories/Traditional Flours.webP';
-import storefrontImage from '../assets/images/categories/meva.png';
-import interiorImage from '../assets/images/categories/Handmade Laddoos.webP';
-import masalaHeroImage from '../assets/images/categories/Malvani Masalas & Chutneys.webP';
-import cashewPremiumImage from '../assets/images/Kaju/Polish kaju 3 (medium size).webP';
+import cookingImage from '../assets/images/malvani_cooking_1780594653286.png';
+import storefrontImage from '../assets/images/geetas_storefront_1780594715235.png';
+import interiorImage from '../assets/images/geetas_interior_1780594732720.png';
+import masalaHeroImage from '../assets/images/masala_hero_1780594616996.png';
+import cashewPremiumImage from '../assets/images/cashew_premium_1780594672474.png';
 
 export const STORE_CONFIG = {
   googleReviewUrl: 'https://g.page/r/CXYjMiOURBwSEAE/review'
@@ -747,34 +747,67 @@ export const TESTIMONIALS: Testimonial[] = [
   {
     id: 't1',
     name: 'Suhas Parab',
-    location: 'Mumbai (Native of Malvan)',
+    location: 'Mumbai, Maharashtra',
     rating: 5,
     review: 'I have lived in Mumbai for 20 years, but my kitchen always smells like Malvan thanks to Geeta’s Sunday Masala. The coarse roast and oil release is exactly how my grandmother used to grind spices in Kasal. Highly recommended!',
-    product: 'Malvani Special Sunday Masala'
+    product: 'Malvani Special Sunday Masala',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+    level: 'Local Guide Level 6',
+    stats: '45 reviews • 12 ratings',
+    points: '1,200 / 1,500 points',
+    link: 'https://share.google/pB6m8wqRKfTtjjBQG'
   },
   {
     id: 't2',
     name: 'Sneha Shirodkar',
-    location: 'Pune',
+    location: 'Pune, Maharashtra',
     rating: 5,
     review: 'Their Basmati Modak Pith was an absolute lifesaver during Ganesh Chaturthi! The modaks turned out beautiful white, extremely soft, and didn’t develop a single tear. Absolute high-quality flour.',
-    product: 'Basmati Modak Pith'
+    product: 'Basmati Modak Pith',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
+    level: 'Local Guide Level 4',
+    stats: '20 reviews • 5 ratings',
+    points: '400 / 500 points',
+    link: 'https://share.google/fpisQ5AJlVNHpgOoe'
   },
   {
     id: 't3',
-    name: 'Chef Milind Sawant',
-    location: 'Alibaug Heritage Resort',
+    name: 'Anoushka Ghosh Das',
+    location: 'Littlearth Square, Ooty',
     rating: 5,
-    review: 'As a chef specializing in coastal seafood, I demand absolute authenticity. Geeta’s Fish Fry Masala has the perfect dry-roasted tang of coastal spices. It coats pomfret spectacularly and doesn’t burn in hot pan oil.',
-    product: 'Malvani Fish Fry Masala'
+    review: 'The food is extraordinary, one of the must visit places in Ooty. Also, special mention to Manasa, she was very sweet and kind and made our experience extra special.',
+    product: 'Store Visit',
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+    level: 'Local Guide Level 5',
+    stats: '13 reviews • 3 ratings',
+    points: '528 / 1,500 points',
+    link: 'https://share.google/NcpY1oAMFBXnyuQDA'
   },
   {
     id: 't4',
-    name: 'Rajen Bhise',
-    location: 'Kasal',
+    name: 'Rohit Kadam',
+    location: 'Thane, Maharashtra',
     rating: 5,
-    review: 'Their dry-fruit Kaju cashew selections are legendary in our region! Large jumbo nuts, freshly dried, completely sweet and high-grade. Excellent gift options for families visiting the Konkan.',
-    product: 'Polish Kaju (Big Size)'
+    review: 'Authentic taste! The Malvani Fish Fry Masala gives the exact crispy texture and spicy kick you expect from a proper coastal meal. Best I have found outside of Konkan.',
+    product: 'Malvani Fish Fry Masala',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+    level: 'Local Guide Level 3',
+    stats: '10 reviews • 2 ratings',
+    points: '150 / 300 points',
+    link: 'https://share.google/tnlrmunaFTNblcSZy'
+  },
+  {
+    id: 't5',
+    name: 'Priyanka Desai',
+    location: 'Bengaluru, Karnataka',
+    rating: 5,
+    review: 'Fast shipping and brilliant packaging. The Kanda Lasun Masala is so potent you only need a little bit to flavor the entire dish. Really impressed with Geeta\'s Masale.',
+    product: 'Kanda Lasun Masala',
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&auto=format&fit=crop&q=80',
+    level: 'Local Guide Level 7',
+    stats: '120 reviews • 45 ratings',
+    points: '4,500 / 5,000 points',
+    link: 'https://share.google/oPiu1fp23C1IEVazR'
   }
 ];
 

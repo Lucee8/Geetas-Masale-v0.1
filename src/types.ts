@@ -38,6 +38,11 @@ export interface Testimonial {
   rating: number;
   review: string;
   product: string;
+  avatar?: string;
+  level?: string;
+  stats?: string;
+  points?: string;
+  link?: string;
 }
 
 export interface GalleryItem {
