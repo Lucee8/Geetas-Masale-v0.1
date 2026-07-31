@@ -339,7 +339,18 @@
               setCategories(catSnap.docs.map(d => ({ id: d.id, ...d.data() })));
             } else if (activeTab === 'recipes') {
               const recSnap = await getDocs(collection(db, 'recipes'));
-              setRecipes(recSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+              const fbRecipes = recSnap.docs.map(d => ({ id: d.id, ...d.data() })) as any[];
+              const merged = [...RECIPES];
+              fbRecipes.forEach(r => {
+                if (!merged.find(mr => mr.id === r.id)) {
+                  merged.push(r);
+                } else {
+                  // replace static with updated from db
+                  const index = merged.findIndex(mr => mr.id === r.id);
+                  merged[index] = r;
+                }
+              });
+              setRecipes(merged);
             } else if (activeTab === 'orders') {
               const [orderSnap, prodSnap] = await Promise.all([
                 getDocs(collection(db, 'orders')),
@@ -434,8 +445,17 @@
           const data = await safeFetchJson('/api/admin/categories', { headers });
           setCategories(data);
         } else if (activeTab === 'recipes') {
-          const data = await safeFetchJson('/api/admin/recipes', { headers }).catch(() => RECIPES);
-          setRecipes(data);
+          const data = await safeFetchJson('/api/admin/recipes', { headers }).catch(() => []);
+          const mergedAPI = [...RECIPES];
+          (data || []).forEach(r => {
+            if (!mergedAPI.find(mr => mr.id === r.id)) {
+              mergedAPI.push(r);
+            } else {
+              const index = mergedAPI.findIndex(mr => mr.id === r.id);
+              mergedAPI[index] = r;
+            }
+          });
+          setRecipes(mergedAPI);
         } else if (activeTab === 'orders') {
           const [orderData, prodData] = await Promise.all([
             safeFetchJson('/api/admin/orders', { headers }),
@@ -664,7 +684,7 @@
     };
 
     // Convert uploaded image file locally to compressed Base64
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, objectType: 'product' | 'category') => {
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, objectType: 'product' | 'category' | 'recipe' | 'coupon' | 'any') => {
       const file = e.target.files?.[0];
       if (!file) return;
 
@@ -672,8 +692,10 @@
         const compressedBase64 = await compressImage(file);
         if (objectType === 'product') {
           setProductForm(prev => ({ ...prev, image: compressedBase64 }));
-        } else {
+        } else if (objectType === 'category') {
           setCategoryForm(prev => ({ ...prev, image: compressedBase64 }));
+        } else if (objectType === 'recipe') {
+          setRecipeForm(prev => ({ ...prev, image: compressedBase64 }));
         }
       } catch (err: any) {
         alert(err.message || "Failed to process image. It may be too large.");

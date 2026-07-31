@@ -698,7 +698,7 @@ router.post('/admin/coupons', authenticateJWT, authorizeRoles(['Super Admin', 'M
 
 router.put('/admin/coupons/:id', authenticateJWT, (req, res) => {
   const coupons = getCoupons();
-  const cIdx = coupons.findIndex(c => c.id == req.params.id || c.id === req.params.id);
+  const cIdx = coupons.findIndex(c => String(c.id) === String(req.params.id));
   if (cIdx !== -1) {
     coupons[cIdx] = { ...coupons[cIdx], ...req.body };
     saveCoupons(coupons);
@@ -709,7 +709,7 @@ router.put('/admin/coupons/:id', authenticateJWT, (req, res) => {
 
 router.delete('/admin/coupons/:id', authenticateJWT, (req, res) => {
   const coupons = getCoupons();
-  const cIdx = coupons.findIndex(c => c.id == req.params.id || c.id === req.params.id);
+  const cIdx = coupons.findIndex(c => String(c.id) === String(req.params.id));
   if (cIdx !== -1) {
     coupons.splice(cIdx, 1);
     saveCoupons(coupons);

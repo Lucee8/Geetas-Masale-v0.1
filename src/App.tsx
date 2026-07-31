@@ -109,6 +109,25 @@ export default function App() {
 
           const products = prodSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Product[];
           const categories = catSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          const recSnap = await getDocs(collection(db, 'recipes'));
+          const recipes = recSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Recipe[];
+          
+          if (recipes.length > 0) {
+            // Merge custom recipes with static recipes
+            const merged = [...RECIPES];
+            recipes.forEach(r => {
+              if (!merged.find(mr => mr.id === r.id)) {
+                merged.push(r);
+              } else {
+                const index = merged.findIndex(mr => mr.id === r.id);
+                merged[index] = r;
+              }
+            });
+            setRecipesList(merged);
+          } else {
+            setRecipesList(RECIPES);
+          }
+          
 
           if (products.length > 0) {
             setProductsList(products);
@@ -137,9 +156,10 @@ export default function App() {
         return;
       }
 
-      const [prodRes, catRes] = await Promise.all([
+      const [prodRes, catRes, recRes] = await Promise.all([
         fetch('/api/products').catch(() => null),
-        fetch('/api/categories').catch(() => null)
+        fetch('/api/categories').catch(() => null),
+        fetch('/api/recipes').catch(() => null)
       ]);
       
       let gotProducts = false;
@@ -176,7 +196,31 @@ export default function App() {
       if (!gotCategories) {
         setCategoriesList(CATEGORIES);
       }
-      setRecipesList(RECIPES); // always default recipes for API flow if not implemented there
+      
+      if (recRes && recRes.ok) {
+        try {
+          const recData = await recRes.json();
+          if (Array.isArray(recData) && recData.length > 0) {
+            const merged = [...RECIPES];
+            recData.forEach((r: any) => {
+              if (!merged.find(mr => mr.id === r.id)) {
+                merged.push(r);
+              } else {
+                const index = merged.findIndex(mr => mr.id === r.id);
+                merged[index] = r;
+              }
+            });
+            setRecipesList(merged);
+          } else {
+            setRecipesList(RECIPES);
+          }
+        } catch (err) {
+          setRecipesList(RECIPES);
+        }
+      } else {
+        setRecipesList(RECIPES);
+      }
+
       
     } catch (e) {
       console.error("Failed to load products/categories from express DB APIs, falling back to local:", e);

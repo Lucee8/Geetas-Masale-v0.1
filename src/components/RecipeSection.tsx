@@ -16,6 +16,7 @@ interface RecipeSectionProps {
 export default function RecipeSection({ recipesList = RECIPES }: RecipeSectionProps) {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
+  console.log("RecipeSection recipesList: ", recipesList);
   return (
     <section id="recipes" className="py-24 bg-white text-slate-800 relative snap-start scroll-mt-20">
       {/* Wave bottom decoration */}
@@ -189,7 +190,7 @@ export default function RecipeSection({ recipesList = RECIPES }: RecipeSectionPr
                     Ingredients Checklist
                   </h4>
                   <ul className="space-y-2 text-xs text-gray-600 font-sans list-disc pl-4 leading-relaxed">
-                    {selectedRecipe.ingredients.map((ing, idx) => (
+                    {(Array.isArray(selectedRecipe.ingredients) ? selectedRecipe.ingredients : [selectedRecipe.ingredients]).filter(Boolean).map((ing, idx) => (
                       <li key={idx} className="hover:text-black transition-colors">
                         {ing}
                       </li>
@@ -203,7 +204,7 @@ export default function RecipeSection({ recipesList = RECIPES }: RecipeSectionPr
                     Preparation Steps
                   </h4>
                   <ol className="space-y-3">
-                    {selectedRecipe.steps.map((step, idx) => (
+                    {(Array.isArray(selectedRecipe.steps) ? selectedRecipe.steps : [selectedRecipe.steps]).filter(Boolean).map((step, idx) => (
                       <li key={idx} className="flex space-x-3 text-xs text-gray-700 leading-relaxed bg-[#FAF9F6] p-3 rounded-xl border border-slate-100">
                         <span className="font-extrabold text-sm text-[#A61B1B] font-mono shrink-0">
                           {(idx + 1).toString().padStart(2, '0')}
