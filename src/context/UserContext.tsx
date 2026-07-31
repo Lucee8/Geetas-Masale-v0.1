@@ -789,7 +789,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const sendOTP = async (phoneNumber: string, verifier: any) => {
     if (!isFirebaseConfigured || !auth) {
       if (isProduction) {
-        throw new Error('Firebase is not configured on this production environment. Please ensure you have added VITE_FIREBASE_API_KEY and VITE_FIREBASE_PROJECT_ID under Environment Variables in your Render dashboard.');
+        throw new Error('Firebase is not configured on this production environment. Please ensure you have added VITE_FIREBASE_API_KEY and VITE_FIREBASE_PROJECT_ID under Environment Variables in your hosting dashboard.');
       }
       // Sandbox mode: mock OTP transmission
       console.log(`[Demo Mobile Auth] OTP requested for ${phoneNumber}. Direct fallback activated.`);
@@ -806,7 +806,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       if (isProduction) {
         let extraMsg = '';
         if (err.code === 'auth/unauthorized-domain' || (err.message && err.message.includes('unauthorized-domain'))) {
-          extraMsg = ' (Your Render URL is not added to the "Authorized Domains" list in your Firebase Console. Please add geetas-s-masale-v0-1.onrender.com under Firebase Console -> Authentication -> Settings -> Authorized Domains)';
+          extraMsg = ' (Your hosting URL is not added to the "Authorized Domains" list in your Firebase Console. Please add your production domain under Firebase Console -> Authentication -> Settings -> Authorized Domains)';
         }
         throw new Error(err.message || `Failed to send OTP: ${err.code || err}${extraMsg}`);
       }
