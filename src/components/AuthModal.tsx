@@ -22,7 +22,6 @@ interface AuthModalProps {
 
 export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const { 
-    loginAsDemo,
     loginWithGoogle
   } = useUser();
 
@@ -58,22 +57,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     }
   };
 
-  const handleDemoLogin = () => {
-    setError(null);
-    setLoading(true);
-    try {
-      loginAsDemo();
-      setInfoMessage('Logged in as Demo Customer!');
-      setTimeout(() => {
-        if (onSuccess) onSuccess();
-        onClose();
-      }, 1000);
-    } catch (err: any) {
-      setError(err.message || 'Demo Login failed.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (!isOpen) return null;
 
@@ -161,20 +144,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 </div>
                 <span>Continue with <span className="font-bold">Google</span></span>
               </button>
-
-              {/* 2. Demo Login option for quick review (Non-production) */}
-              {!isProduction && (
-                <div className="text-center pt-2">
-                  <button
-                    type="button"
-                    onClick={handleDemoLogin}
-                    className="text-[11px] text-amber-600 hover:text-amber-800 font-bold tracking-wider uppercase transition-all flex items-center justify-center space-x-1.5 mx-auto cursor-pointer"
-                  >
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>Quick Demo Login (Bypass)</span>
-                  </button>
-                </div>
-              )}
             </div>
 
             {/* Bottom Guest Mode Action */}

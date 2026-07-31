@@ -71,6 +71,7 @@ export interface OrderItem {
   quantity: number;
   price: number;
   weight: string;
+  image?: string;
 }
 
 export interface Order {
@@ -443,7 +444,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     } catch (error: any) {
       console.error("Firebase Login Error:", error);
       if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.message?.includes('credential')) {
-        throw new Error('Invalid email or password. Feel free to use the "Quick Demo Login" button to sign in instantly with mock data!');
+        throw new Error('Invalid email or password.');
       }
       throw error;
     }
