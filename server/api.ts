@@ -16,8 +16,9 @@ import {
   getContactMessages, saveContactMessages,
   getWebsiteSettings, saveWebsiteSettings,
   getBanners, saveBanners,
+  getRecipes, saveRecipes,
   getCoupons, saveCoupons,
-  Product, Category, Order, Review, ContactMessage
+  Product, Category, Order, Review, ContactMessage, Recipe
 } from './db/database';
 import { authenticateJWT, authorizeRoles, AuthenticatedRequest } from './middleware/auth';
 
@@ -62,6 +63,13 @@ router.get('/products', (req, res) => {
   }
   
   res.json(filtered);
+});
+
+
+// Recipes list
+router.get('/recipes', (req, res) => {
+  const recipes = getRecipes();
+  res.json(recipes);
 });
 
 // Single product details
@@ -690,7 +698,7 @@ router.post('/admin/coupons', authenticateJWT, authorizeRoles(['Super Admin', 'M
 
 router.put('/admin/coupons/:id', authenticateJWT, (req, res) => {
   const coupons = getCoupons();
-  const cIdx = coupons.findIndex(c => c.id === Number(req.params.id));
+  const cIdx = coupons.findIndex(c => c.id === Number(req.params.id) || c.id === req.params.id);
   if (cIdx !== -1) {
     coupons[cIdx] = { ...coupons[cIdx], ...req.body };
     saveCoupons(coupons);
@@ -699,6 +707,16 @@ router.put('/admin/coupons/:id', authenticateJWT, (req, res) => {
   res.status(404).json({ error: 'Coupon not found' });
 });
 
+router.delete('/admin/coupons/:id', authenticateJWT, (req, res) => {
+  const coupons = getCoupons();
+  const cIdx = coupons.findIndex(c => c.id === Number(req.params.id) || c.id === req.params.id);
+  if (cIdx !== -1) {
+    coupons.splice(cIdx, 1);
+    saveCoupons(coupons);
+    return res.status(204).send();
+  }
+  res.status(404).json({ error: 'Coupon not found' });
+});
 
 // -- Real-time Analytics Calculations (STEP 13) --
 router.get('/admin/analytics', authenticateJWT, (req, res) => {
@@ -719,19 +737,31 @@ router.get('/admin/analytics', authenticateJWT, (req, res) => {
   const itemsOnHandCount = products.reduce((sum, p) => sum + p.stock, 0);
   const lowStockThresholdCount = products.filter(p => p.stock < 15).length;
 
-  // B. Construct orders timeline analytics (By Days/Months)
+    // B. Construct orders timeline analytics (By Days/Months)
   const monthlyTimeline: { [key: string]: number } = {};
+  
+  // Pre-fill last 6 months with 0
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date();
+    d.setMonth(d.getMonth() - i);
+    const key = d.toLocaleString('default', { month: 'short' }) + ' ' + d.getFullYear().toString().slice(-2);
+    monthlyTimeline[key] = 0;
+  }
+
   orders.forEach(o => {
-    // Expected date key: "Year-Month"
     const date = new Date(o.createdAt);
     const key = date.toLocaleString('default', { month: 'short' }) + ' ' + date.getFullYear().toString().slice(-2);
-    monthlyTimeline[key] = (monthlyTimeline[key] || 0) + o.amount;
+    if (monthlyTimeline[key] !== undefined) {
+      monthlyTimeline[key] += o.amount;
+    } else {
+      monthlyTimeline[key] = o.amount;
+    }
   });
 
   const ordersOverTime = Object.keys(monthlyTimeline).map(month => ({
     period: month,
     revenue: monthlyTimeline[month]
-  })).slice(-12);
+  })).slice(-6);
 
   // C. Top Selling Products
   const salesMap = new Map<string, { name: string; qty: number; category: string; value: number }>();
@@ -775,17 +805,39 @@ router.get('/admin/analytics', authenticateJWT, (req, res) => {
   }));
 
   // E. Compile Recent Activity List
-  const recentOrders = orders
+  const allRecentItems: any[] = [];
+  let globalCounter = 1;
+  orders
     .slice()
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, 5)
-    .map(o => ({
-      id: o.id,
-      customer: o.customerName,
-      amount: o.amount,
-      status: o.status,
-      date: o.createdAt
-    }));
+    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+    .forEach(o => {
+       const orderDate = new Date(o.createdAt || new Date());
+       const yy = String(orderDate.getFullYear()).slice(-2);
+       const mm = String(orderDate.getMonth() + 1).padStart(2, '0');
+       const prefix = `order_${yy}${mm}`;
+       
+       const items = o.items || [];
+       if (items.length > 0) {
+         items.forEach((item: any) => {
+           allRecentItems.push({
+             id: `${prefix}${String(globalCounter++).padStart(3, '0')}`,
+             customer: o.customerName || 'Customer',
+             amount: Number(item.price || 0) * Number(item.quantity || 1),
+             status: o.status,
+             date: o.createdAt || new Date().toISOString()
+           });
+         });
+       } else {
+         allRecentItems.push({
+           id: `${prefix}${String(globalCounter++).padStart(3, '0')}`,
+           customer: o.customerName || 'Customer',
+           amount: Number(o.amount || 0),
+           status: o.status,
+           date: o.createdAt || new Date().toISOString()
+         });
+       }
+    });
+  const recentOrders = allRecentItems.reverse().slice(0, 10);
 
   res.json({
     summary: {

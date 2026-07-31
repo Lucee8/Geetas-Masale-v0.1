@@ -821,34 +821,54 @@
       e.preventDefault();
       setSubmitting(true);
       try {
-        if (isFirebaseConfigured && db) {
-          const isEditing = !!editingRecipe;
-          const recId = isEditing ? editingRecipe.id : `r_${Date.now()}`;
-          
-          let parsedIngredients = recipeForm.ingredients;
-          if (typeof parsedIngredients === 'string') {
-             parsedIngredients = parsedIngredients.split(',').map(s => s.trim()).filter(Boolean);
-          }
-          let parsedSteps = recipeForm.steps;
-          if (typeof parsedSteps === 'string') {
-             parsedSteps = parsedSteps.split('\n').map(s => s.trim()).filter(Boolean);
-          }
+        let parsedIngredients = recipeForm.ingredients;
+        if (typeof parsedIngredients === 'string') {
+           parsedIngredients = parsedIngredients.split(',').map(s => s.trim()).filter(Boolean);
+        }
+        let parsedSteps = recipeForm.steps;
+        if (typeof parsedSteps === 'string') {
+           parsedSteps = parsedSteps.split('\n').map(s => s.trim()).filter(Boolean);
+        }
 
-          const finalForm = { 
-            ...recipeForm, 
-            id: recId,
-            ingredients: parsedIngredients,
-            steps: parsedSteps
-          };
-          
+        const isEditing = !!editingRecipe;
+        const recId = isEditing ? editingRecipe.id : `r_${Date.now()}`;
+        
+        const finalForm = { 
+          ...recipeForm, 
+          id: recId,
+          ingredients: parsedIngredients,
+          steps: parsedSteps
+        };
+
+        if (isFirebaseConfigured && db) {
           await setDoc(doc(db, 'recipes', recId), finalForm);
           showToast(isEditing ? 'Recipe successfully modified.' : 'New recipe created.');
           setIsRecipeModalOpen(false);
           setEditingRecipe(null);
           loadDataForTab();
+          return;
+        }
+
+        // Backend save via API
+        const url = isEditing ? `/api/admin/recipes/${editingRecipe.id}` : '/api/admin/recipes';
+        const method = isEditing ? 'PUT' : 'POST';
+
+        const res = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(finalForm)
+        });
+
+        if (res.ok) {
+          showToast(isEditing ? 'Recipe successfully modified.' : 'New recipe created.');
+          setIsRecipeModalOpen(false);
+          setEditingRecipe(null);
+          loadDataForTab();
         } else {
-          showToast('Sandbox mode: Firebase is disconnected. Edits not saved.');
-          setTimeout(() => setIsRecipeModalOpen(false), 800);
+          throw new Error('Failed API response');
         }
       } catch (err) {
         console.error('Failed to submit recipe:', err);
@@ -858,7 +878,33 @@
       }
     };
 
-    const handleCategorySubmit = async (e: React.FormEvent) => {
+    
+    const handleDeleteRecipe = async (id: string) => {
+      if (!confirm('Are you sure you want to delete this recipe?')) return;
+      try {
+        if (isFirebaseConfigured && db) {
+          await deleteDoc(doc(db, 'recipes', id));
+          showToast('Recipe deleted.');
+          loadDataForTab();
+          return;
+        }
+
+        const res = await fetch(`/api/admin/recipes/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          showToast('Recipe deleted.');
+          loadDataForTab();
+        } else {
+          throw new Error('Failed to delete recipe');
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('Error deleting recipe.');
+      }
+    };
+const handleCategorySubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       setSubmitting(true);
       try {
@@ -2321,6 +2367,12 @@
                                       >
                                         Edit
                                       </button>
+                                      <button
+                                        onClick={() => handleDeleteRecipe(recipe.id)}
+                                        className="px-3 py-1.5 rounded-lg border border-red-100 text-[10px] font-bold font-mono tracking-wider text-red-600 hover:border-red-200 hover:bg-red-50 transition-colors"
+                                      >
+                                        Delete
+                                      </button>
                                     </div>
                                   </td>
                                 </tr>
@@ -3718,6 +3770,147 @@
 
 
         {/* ========================================================= */}
+        
+        {/* ========================================================= */}
+        {/* RECIPE ADD / EDIT MODAL COMPONENT                         */}
+        {/* ========================================================= */}
+        {isRecipeModalOpen && (
+          <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/40 backdrop-blur-md flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="w-full max-w-2xl bg-[#FAF9F6] rounded-3xl p-5 shadow-2xl border border-slate-100 text-left max-h-[90vh] overflow-y-auto"
+            >
+              <div className="flex justify-between items-center border-b border-slate-200/60 pb-3 mb-4">
+                <h3 className="text-sm font-black font-mono uppercase tracking-wider text-slate-800">
+                  {editingRecipe ? 'Edit Recipe Guide' : 'Add New Recipe'}
+                </h3>
+                <button onClick={() => setIsRecipeModalOpen(false)} className="text-slate-400 hover:text-slate-600">✕</button>
+              </div>
+
+              <form onSubmit={handleRecipeSubmit} className="space-y-4">
+                {/* Image Upload */}
+                <div className="p-4 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50 flex flex-col items-center justify-center text-center">
+                  {recipeForm.image ? (
+                    <div className="relative group">
+                      <img src={recipeForm.image} alt="Preview" className="h-32 object-contain rounded-lg" />
+                      <div className="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center rounded-lg">
+                         <label className="text-xs text-white font-bold cursor-pointer">
+                           Change Image
+                           <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'recipe')} />
+                         </label>
+                      </div>
+                    </div>
+                  ) : (
+                    <label className="cursor-pointer flex flex-col items-center">
+                      <Image className="w-8 h-8 text-slate-300 mb-2" />
+                      <span className="text-xs font-bold text-slate-600">Click to upload recipe photo</span>
+                      <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'recipe')} />
+                    </label>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Title</label>
+                    <input
+                      required type="text"
+                      value={recipeForm.title}
+                      onChange={e => setRecipeForm({ ...recipeForm, title: e.target.value })}
+                      className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-[#A61B1B]"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Servings</label>
+                    <input
+                      required type="number" min="1"
+                      value={recipeForm.servings}
+                      onChange={e => setRecipeForm({ ...recipeForm, servings: Number(e.target.value) })}
+                      className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-[#A61B1B]"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Prep Time</label>
+                    <input
+                      required type="text" placeholder="15 mins"
+                      value={recipeForm.prepTime}
+                      onChange={e => setRecipeForm({ ...recipeForm, prepTime: e.target.value })}
+                      className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-[#A61B1B]"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Cook Time</label>
+                    <input
+                      required type="text" placeholder="20 mins"
+                      value={recipeForm.cookTime}
+                      onChange={e => setRecipeForm({ ...recipeForm, cookTime: e.target.value })}
+                      className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-[#A61B1B]"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Difficulty</label>
+                    <select
+                      value={recipeForm.difficulty}
+                      onChange={e => setRecipeForm({ ...recipeForm, difficulty: e.target.value as any })}
+                      className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-[#A61B1B]"
+                    >
+                      <option value="Easy">Easy</option>
+                      <option value="Medium">Medium</option>
+                      <option value="Expert">Expert</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Description</label>
+                  <textarea
+                    required rows={2}
+                    value={recipeForm.description}
+                    onChange={e => setRecipeForm({ ...recipeForm, description: e.target.value })}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-[#A61B1B]"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Ingredients (Comma separated)</label>
+                  <textarea
+                    required rows={3}
+                    value={recipeForm.ingredients as string}
+                    onChange={e => setRecipeForm({ ...recipeForm, ingredients: e.target.value })}
+                    placeholder="2 cups rice, 1 tsp salt, water"
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-[#A61B1B]"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Steps (Newline separated)</label>
+                  <textarea
+                    required rows={4}
+                    value={recipeForm.steps as string}
+                    onChange={e => setRecipeForm({ ...recipeForm, steps: e.target.value })}
+                    placeholder="Step 1...
+Step 2..."
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-[#A61B1B]"
+                  />
+                </div>
+
+                <div className="pt-2 border-t border-slate-200/60 mt-4 flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="px-5 py-2.5 bg-[#A61B1B] text-white text-xs font-bold font-mono uppercase tracking-wider rounded-xl hover:bg-red-800 transition-colors shadow-md disabled:opacity-50"
+                  >
+                    {submitting ? 'Saving...' : 'Save Recipe'}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+
         {/* 12. COUPON CODE CREATION MODAL                            */}
         {/* ========================================================= */}
         {isCouponModalOpen && (

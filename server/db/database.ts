@@ -116,6 +116,20 @@ export interface Review {
   approved: boolean;
 }
 
+
+export interface Recipe {
+  id: string;
+  title: string;
+  prepTime: string;
+  cookTime: string;
+  difficulty: 'Easy' | 'Medium' | 'Expert';
+  servings: number;
+  ingredients: string[];
+  steps: string[];
+  description: string;
+  image: string;
+}
+
 export interface ContactMessage {
   id: number;
   name: string;
@@ -945,3 +959,6 @@ export const saveBanners = (banners: Banner[]) => writeDataFile('banners.json', 
 
 export const getCoupons = () => readDataFile<Coupon[]>('coupons.json', DEFAULT_COUPONS);
 export const saveCoupons = (coupons: Coupon[]) => writeDataFile('coupons.json', coupons);
+
+export const getRecipes = (): Recipe[] => readDataFile<Recipe[]>('recipes.json', []);
+export const saveRecipes = (data: Recipe[]): void => writeDataFile('recipes.json', data);
