@@ -84,7 +84,7 @@ export const CATEGORIES = [
     id: 'Kaju',
     name: 'Premium Malvan Cashews (Kaju)',
     description: 'Export-grade whole cashews, salted variants, masala-flavored crunch, and healthy split kernels.',
-    image: cashewPremiumImage,
+    image: "https://m.media-amazon.com/images/I/51zztW0aVEL.jpg",
     count: 7
   }
 ];
