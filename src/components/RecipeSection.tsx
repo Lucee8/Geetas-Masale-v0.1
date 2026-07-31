@@ -56,7 +56,7 @@ export default function RecipeSection({ recipesList = RECIPES }: RecipeSectionPr
               {/* Photo top section with hover preview reveal */}
               <div className="relative h-60 overflow-hidden shrink-0">
                 <img
-                  src={recipe.image}
+                  src={recipe.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'}
                   alt={recipe.title}
                   className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
                   referrerPolicy="no-referrer"
@@ -146,7 +146,7 @@ export default function RecipeSection({ recipesList = RECIPES }: RecipeSectionPr
               {/* Card top branding image */}
               <div className="relative h-48 bg-[#A61B1B] flex items-end p-6 md:p-8">
                 <img
-                  src={selectedRecipe.image}
+                  src={selectedRecipe.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'}
                   alt={selectedRecipe.title}
                   className="absolute inset-0 w-full h-full object-cover opacity-50"
                   referrerPolicy="no-referrer"

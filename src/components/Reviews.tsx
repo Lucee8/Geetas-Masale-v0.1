@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Star, MessageSquare, ChevronLeft, ChevronRight, User } from 'lucide-react';
+import { Star, X, MessageSquare, ChevronLeft, ChevronRight, User } from 'lucide-react';
 import { TESTIMONIALS } from '../data/storeData';
 import { isFirebaseConfigured, db, isVercel } from '../lib/firebase';
 import { collection, doc, setDoc, getDocs } from 'firebase/firestore';

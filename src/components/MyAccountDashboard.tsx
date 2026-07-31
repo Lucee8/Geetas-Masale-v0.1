@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
+  X,
   User as UserIcon, 
   ShoppingBag, 
   Heart, 
@@ -577,7 +578,7 @@ export default function MyAccountDashboard({ onClose, onOpenCart, onAddToCart }:
                         return (
                           <div key={prodId} className="border border-slate-100 rounded-xl p-2.5 text-center flex flex-col justify-between">
                             <img 
-                              src={resolveProductImage(prod)} 
+                              src={resolveProductImage(prod) || 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&auto=format&fit=crop&q=80'} 
                               alt={prod.name} 
                               className="w-14 h-14 object-contain mx-auto rounded-lg mb-2"
                               referrerPolicy="no-referrer"
@@ -776,7 +777,7 @@ export default function MyAccountDashboard({ onClose, onOpenCart, onAddToCart }:
                         >
                           <div className="relative">
                             <img 
-                              src={resolveProductImage(prod)} 
+                              src={resolveProductImage(prod) || 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&auto=format&fit=crop&q=80'} 
                               alt={prod.name} 
                               className="w-24 h-24 object-contain mx-auto rounded-xl mb-3"
                               referrerPolicy="no-referrer"
