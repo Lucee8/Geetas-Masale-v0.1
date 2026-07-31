@@ -92,18 +92,20 @@ Please get back to me with terms and details. Thank you!`;
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-25">
         
         {/* Section Title */}
-        <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
+        {/* <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-[#A61B1B]/10 border border-[#A61B1B]/30 text-[#A61B1B] text-xs font-mono tracking-widest uppercase">
             <MapPin className="w-4 h-4 text-[#A61B1B]" />
             <span>KASAL SPICE HUB LOCATION</span>
-          </div>
+          </div> */}
+
           <h2 className="font-sans text-4xl sm:text-5xl font-black tracking-tight uppercase">
             Visit Our Store <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#A61B1B] to-[#D21F1F]">& Connect</span>
           </h2>
-          <p className="text-gray-500 text-sm font-light font-sans max-w-md mx-auto">
+
+          {/* <p className="text-gray-500 text-sm font-light font-sans max-w-md mx-auto">
             Drop by our headquarters on the Kasal-Malvan national highway or dispatch an instant inquiry directly to our phone line.
           </p>
-        </div>
+        </div> */}
 
         {/* 2 Column Coordinates info and form */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch">
