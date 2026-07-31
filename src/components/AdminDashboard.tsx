@@ -843,14 +843,14 @@
       e.preventDefault();
       setSubmitting(true);
       try {
-        let parsedIngredients = recipeForm.ingredients;
-        if (typeof parsedIngredients === 'string') {
-           parsedIngredients = parsedIngredients.split(',').map(s => s.trim()).filter(Boolean);
-        }
-        let parsedSteps = recipeForm.steps;
-        if (typeof parsedSteps === 'string') {
-           parsedSteps = parsedSteps.split('\n').map(s => s.trim()).filter(Boolean);
-        }
+        const parsedIngredients = recipeForm.ingredients
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean);
+        const parsedSteps = recipeForm.steps
+          .split('\n')
+          .map(s => s.trim())
+          .filter(Boolean);
 
         const isEditing = !!editingRecipe;
         const recId = isEditing ? editingRecipe.id : `r_${Date.now()}`;

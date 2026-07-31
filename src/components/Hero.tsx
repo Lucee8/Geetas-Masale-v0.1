@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { motion } from 'motion/react';
+import { motion, type Variants } from 'motion/react';
 import { MoveRight } from 'lucide-react';
 import { resolveCategoryImage } from '../data/storeData';
 
@@ -28,7 +28,7 @@ export default function Hero({ onExploreClick, onWhatsAppClick, onSelectCategory
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: { 
       opacity: 1, 
