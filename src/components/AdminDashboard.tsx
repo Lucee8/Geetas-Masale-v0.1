@@ -340,17 +340,7 @@
             } else if (activeTab === 'recipes') {
               const recSnap = await getDocs(collection(db, 'recipes'));
               const fbRecipes = recSnap.docs.map(d => ({ id: d.id, ...d.data() })) as any[];
-              const merged = [...RECIPES];
-              fbRecipes.forEach(r => {
-                if (!merged.find(mr => mr.id === r.id)) {
-                  merged.push(r);
-                } else {
-                  // replace static with updated from db
-                  const index = merged.findIndex(mr => mr.id === r.id);
-                  merged[index] = r;
-                }
-              });
-              setRecipes(merged);
+              setRecipes(fbRecipes);
             } else if (activeTab === 'orders') {
               const [orderSnap, prodSnap] = await Promise.all([
                 getDocs(collection(db, 'orders')),
@@ -843,14 +833,14 @@
       e.preventDefault();
       setSubmitting(true);
       try {
-        const parsedIngredients = recipeForm.ingredients
-          .split(',')
-          .map(s => s.trim())
-          .filter(Boolean);
-        const parsedSteps = recipeForm.steps
-          .split('\n')
-          .map(s => s.trim())
-          .filter(Boolean);
+        let parsedIngredients = recipeForm.ingredients;
+        if (typeof parsedIngredients === 'string') {
+           parsedIngredients = parsedIngredients.split(',').map(s => s.trim()).filter(Boolean);
+        }
+        let parsedSteps = recipeForm.steps;
+        if (typeof parsedSteps === 'string') {
+           parsedSteps = parsedSteps.split('\n').map(s => s.trim()).filter(Boolean);
+        }
 
         const isEditing = !!editingRecipe;
         const recId = isEditing ? editingRecipe.id : `r_${Date.now()}`;
@@ -4607,3 +4597,4 @@ Step 2..."
       </div>
     );
   }
+  

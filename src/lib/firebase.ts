@@ -22,7 +22,7 @@ import {
   limit,
   writeBatch
 } from 'firebase/firestore';
-import { PRODUCTS, CATEGORIES } from '../data/storeData';
+import { PRODUCTS, CATEGORIES, RECIPES } from '../data/storeData';
 
 const getFirebaseConfig = () => {
   // Check if Express backend injected the configuration globally
@@ -106,13 +106,27 @@ export async function seedDatabaseIfEmpty() {
       console.log("Successfully seeded all products!");
     }
 
+    // 2.5 Check & Seed Recipes
+    const recSnap = await getDocs(collection(db, 'recipes'));
+    if (recSnap.empty && typeof RECIPES !== 'undefined' && Array.isArray(RECIPES) && RECIPES.length > 0) {
+      console.log("Seeding recipes to Firestore...");
+      const recipeBatch = writeBatch(db);
+      RECIPES.forEach((rec) => {
+        const docRef = doc(db, 'recipes', rec.id);
+        recipeBatch.set(docRef, rec);
+      });
+      await recipeBatch.commit();
+      console.log("Successfully seeded recipes!");
+    }
+
+
     // 3. Check & Seed default settings
     const settingsSnap = await getDoc(doc(db, 'settings', 'store_settings'));
     if (!settingsSnap.exists()) {
       console.log("Seeding default store settings to Firestore...");
       await setDoc(doc(db, 'settings', 'store_settings'), {
         storeName: "Geeta's Masale",
-        contactEmail: "bhaveshkoyande8@gmail.com",
+        contactEmail: "geetasmasale@gmail.com",
         contactPhone: "+91 9876543210",
         address: "Malvan, Konkan, Maharashtra, India",
         gstRate: 5,

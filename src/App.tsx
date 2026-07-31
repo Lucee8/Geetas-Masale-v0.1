@@ -94,6 +94,7 @@ export default function App() {
     window.history.pushState(null, '', '/');
     setAdminOpen(false);
     setMyAccountOpen(false); // prevent fall-through to customer account portal
+    fetchStoreData(); // Refresh data so website reflects admin changes
   };
 
   const fetchStoreData = async () => {
@@ -112,18 +113,10 @@ export default function App() {
           const recSnap = await getDocs(collection(db, 'recipes'));
           const recipes = recSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Recipe[];
           
-          if (recipes.length > 0) {
-            // Merge custom recipes with static recipes
-            const merged = [...RECIPES];
-            recipes.forEach(r => {
-              if (!merged.find(mr => mr.id === r.id)) {
-                merged.push(r);
-              } else {
-                const index = merged.findIndex(mr => mr.id === r.id);
-                merged[index] = r;
-              }
-            });
-            setRecipesList(merged);
+          if (recipes.length > 0 || recSnap.docs.length === 0) {
+            // Because recipes are seeded, Firebase is the source of truth. No need to merge.
+            // If they deleted all recipes, it will be 0 length and we respect that.
+            setRecipesList(recipes);
           } else {
             setRecipesList(RECIPES);
           }
@@ -200,17 +193,8 @@ export default function App() {
       if (recRes && recRes.ok) {
         try {
           const recData = await recRes.json();
-          if (Array.isArray(recData) && recData.length > 0) {
-            const merged = [...RECIPES];
-            recData.forEach((r: any) => {
-              if (!merged.find(mr => mr.id === r.id)) {
-                merged.push(r);
-              } else {
-                const index = merged.findIndex(mr => mr.id === r.id);
-                merged[index] = r;
-              }
-            });
-            setRecipesList(merged);
+          if (Array.isArray(recData)) {
+            setRecipesList(recData);
           } else {
             setRecipesList(RECIPES);
           }
