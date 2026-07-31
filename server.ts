@@ -50,13 +50,13 @@ async function startServer() {
         
         // Find configuration from process.env (supports both exact lowercase names, standard uppercase ones, and VITE_ prefixed ones)
         const fbConfig = {
-          apiKey: process.env.VITE_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY || process.env.apiKey || process.env.API_KEY || '',
-          authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || process.env.FIREBASE_AUTH_DOMAIN || process.env.authDomain || process.env.AUTH_DOMAIN || '',
-          projectId: process.env.VITE_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID || process.env.projectId || process.env.PROJECT_ID || '',
-          storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || process.env.FIREBASE_STORAGE_BUCKET || process.env.storageBucket || process.env.STORAGE_BUCKET || '',
-          messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || process.env.FIREBASE_MESSAGING_SENDER_ID || process.env.messagingSenderId || process.env.MESSAGING_SENDER_ID || '',
-          appId: process.env.VITE_FIREBASE_APP_ID || process.env.FIREBASE_APP_ID || process.env.appId || process.env.APP_ID || '',
-          measurementId: process.env.VITE_FIREBASE_MEASUREMENT_ID || process.env.FIREBASE_MEASUREMENT_ID || process.env.measurementId || process.env.MEASUREMENT_ID || ''
+          apiKey: process.env.VITE_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY || process.env.apiKey || process.env.API_KEY || process.env.APIKEY || '',
+          authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || process.env.FIREBASE_AUTH_DOMAIN || process.env.authDomain || process.env.AUTH_DOMAIN || process.env.AUTHDOMAIN || '',
+          projectId: process.env.VITE_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID || process.env.projectId || process.env.PROJECT_ID || process.env.PROJECTID || '',
+          storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || process.env.FIREBASE_STORAGE_BUCKET || process.env.storageBucket || process.env.STORAGE_BUCKET || process.env.STORAGEBUCKET || '',
+          messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || process.env.FIREBASE_MESSAGING_SENDER_ID || process.env.messagingSenderId || process.env.MESSAGING_SENDER_ID || process.env.MESSAGINGSENDERID || '',
+          appId: process.env.VITE_FIREBASE_APP_ID || process.env.FIREBASE_APP_ID || process.env.appId || process.env.APP_ID || process.env.APPID || '',
+          measurementId: process.env.VITE_FIREBASE_MEASUREMENT_ID || process.env.FIREBASE_MEASUREMENT_ID || process.env.measurementId || process.env.MEASUREMENT_ID || process.env.MEASUREMENTID || ''
         };
         
         if (fbConfig.apiKey && fbConfig.projectId) {
