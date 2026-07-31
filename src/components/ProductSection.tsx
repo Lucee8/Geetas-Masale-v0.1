@@ -84,6 +84,22 @@ export default function ProductSection({
     return result;
   }, [selectedCategory, searchQuery, sortBy]);
 
+  
+  // Calculate dynamic header based on selected category
+  const activeCategoryName = useMemo(() => {
+    if (!selectedCategory || selectedCategory === 'all') return null;
+    const tab = filterTabs.find(
+      (t) => t.id.toLowerCase() === selectedCategory.toLowerCase()
+    );
+    let label = tab ? tab.label : selectedCategory;
+    // Strip parentheses and fix specific names based on requirements
+    label = label.replace(/\s*\(.*?\)\s*/g, '');
+    if (label === 'Premium Malvan Cashews') {
+      label = 'Premium Malvani Cashews';
+    }
+    return label;
+  }, [selectedCategory, filterTabs]);
+
   const handleOpenModal = (product: Product) => {
     setSelectedProduct(product);
     setModalQuantity(1);
@@ -118,13 +134,23 @@ Please confirm availability and sharing banking details for packing. Thanks!`;
         <div className="text-center max-w-4xl mx-auto mb-12 space-y-4">
           <div className="inline-flex items-center space-x-2 text-[#A61B1B] text-xs font-mono tracking-widest uppercase">
             <Sparkles className="w-4 h-4 text-[#A61B1B]" />
-            <span>EXQUISITE RETAIL CART</span>
+            <span>{activeCategoryName ? `${activeCategoryName} Collections` : 'EXQUISITE RETAIL CART'}</span>
           </div>
           <h2 className="font-sans text-4xl sm:text-5xl font-black tracking-tight uppercase">
-            Boutique <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#A61B1B] to-[#D21F1F]">Spice Collections</span>
+            {activeCategoryName ? (
+              <>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#A61B1B] to-[#D21F1F]">{activeCategoryName}</span> Collections
+              </>
+            ) : (
+              <>
+                Boutique <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#A61B1B] to-[#D21F1F]">Spice Collections</span>
+              </>
+            )}
           </h2>
           <p className="text-slate-600 text-sm sm:text-base font-light font-sans max-w-xl mx-auto">
-            Review and sort our 40+ authentic Malvani, Konkani and dry fruit items. Select to view dynamic uses, ingredients, and book on-the-spot WhatsApp packets.
+            {activeCategoryName
+              ? `Review and sort our authentic ${activeCategoryName} items. Select to view dynamic uses, ingredients, and book on-the-spot WhatsApp packets.`
+              : `Review and sort our 40+ authentic Malvani, Konkani and dry fruit items. Select to view dynamic uses, ingredients, and book on-the-spot WhatsApp packets.`}
           </p>
         </div>
 
