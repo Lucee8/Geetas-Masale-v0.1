@@ -9,7 +9,11 @@ import { Clock, Users, Flame, BookOpen, ChevronRight, X, Sparkles } from 'lucide
 import { Recipe } from '../types';
 import { RECIPES } from '../data/storeData';
 
-export default function RecipeSection() {
+interface RecipeSectionProps {
+  recipesList?: Recipe[];
+}
+
+export default function RecipeSection({ recipesList = RECIPES }: RecipeSectionProps) {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
   return (
@@ -40,7 +44,7 @@ export default function RecipeSection() {
 
         {/* Recipe Grid cards display */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {RECIPES.map((recipe, idx) => (
+          {recipesList.map((recipe, idx) => (
             <motion.div
               key={recipe.id}
               initial={{ opacity: 0, y: 30 }}

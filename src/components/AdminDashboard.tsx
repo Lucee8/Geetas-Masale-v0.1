@@ -10,7 +10,7 @@
     LayoutDashboard, ShoppingBag, Tags, ListOrdered, Users, CreditCard, 
     Star, MessageSquare, Settings, LogOut, Plus, Edit2, Trash2, Search, 
     Check, X, Truck, AlertCircle, Eye, RefreshCw, Smartphone, Key,
-    XCircle, Filter, Tag, Image, CheckCircle, Store, Send,
+    XCircle, Filter, Tag, Image, CheckCircle, Store, Send, BookOpen, Save,
     Phone, MessageCircle, MoreVertical, ChevronLeft, ChevronRight, Download, Printer, FileText
   } from 'lucide-react';
   import { isFirebaseConfigured, db, auth, isVercel } from '../lib/firebase';
@@ -32,7 +32,7 @@
     signOut,
     onAuthStateChanged
   } from 'firebase/auth';
-  import { PRODUCTS, CATEGORIES, resolveProductImage, resolveCategoryImage } from '../data/storeData';
+  import { PRODUCTS, CATEGORIES, RECIPES, resolveProductImage, resolveCategoryImage } from '../data/storeData';
 
   interface AdminDashboardProps {
     onClose: () => void;
@@ -47,12 +47,13 @@
     const [adminUser, setAdminUser] = useState<any>(null);
 
     // Active Tab
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'categories' | 'orders' | 'customers' | 'reviews' | 'settings' | 'coupons'>('dashboard');
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'categories' | 'recipes' | 'orders' | 'customers' | 'reviews' | 'settings' | 'coupons'>('dashboard');
 
     // API Data Status
     const [analytics, setAnalytics] = useState<any>(null);
     const [products, setProducts] = useState<any[]>([]);
     const [categories, setCategories] = useState<any[]>([]);
+    const [recipes, setRecipes] = useState<any[]>([]);
     const [orders, setOrders] = useState<any[]>([]);
     const [customers, setCustomers] = useState<any[]>([]);
     const [reviews, setReviews] = useState<any[]>([]);
@@ -120,6 +121,21 @@
     const [categoryForm, setCategoryForm] = useState({
       id: '',
       name: '',
+      description: '',
+      image: ''
+    });
+
+    const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false);
+    const [editingRecipe, setEditingRecipe] = useState<any>(null);
+    const [recipeForm, setRecipeForm] = useState({
+      id: '',
+      title: '',
+      prepTime: '',
+      cookTime: '',
+      difficulty: 'Easy',
+      servings: 4,
+      ingredients: '',
+      steps: '',
       description: '',
       image: ''
     });
@@ -321,6 +337,9 @@
             } else if (activeTab === 'categories') {
               const catSnap = await getDocs(collection(db, 'categories'));
               setCategories(catSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+            } else if (activeTab === 'recipes') {
+              const recSnap = await getDocs(collection(db, 'recipes'));
+              setRecipes(recSnap.docs.map(d => ({ id: d.id, ...d.data() })));
             } else if (activeTab === 'orders') {
               const [orderSnap, prodSnap] = await Promise.all([
                 getDocs(collection(db, 'orders')),
@@ -380,6 +399,8 @@
             setCategories(CATEGORIES as any);
           } else if (activeTab === 'categories') {
             setCategories(CATEGORIES as any);
+          } else if (activeTab === 'recipes') {
+            setRecipes(RECIPES as any);
           }
           setLoading(false);
           return;
@@ -412,6 +433,9 @@
         } else if (activeTab === 'categories') {
           const data = await safeFetchJson('/api/admin/categories', { headers });
           setCategories(data);
+        } else if (activeTab === 'recipes') {
+          const data = await safeFetchJson('/api/admin/recipes', { headers }).catch(() => RECIPES);
+          setRecipes(data);
         } else if (activeTab === 'orders') {
           const [orderData, prodData] = await Promise.all([
             safeFetchJson('/api/admin/orders', { headers }),
@@ -792,6 +816,48 @@
     };
 
     // Categories Submit
+    
+    const handleRecipeSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setSubmitting(true);
+      try {
+        if (isFirebaseConfigured && db) {
+          const isEditing = !!editingRecipe;
+          const recId = isEditing ? editingRecipe.id : `r_${Date.now()}`;
+          
+          let parsedIngredients = recipeForm.ingredients;
+          if (typeof parsedIngredients === 'string') {
+             parsedIngredients = parsedIngredients.split(',').map(s => s.trim()).filter(Boolean);
+          }
+          let parsedSteps = recipeForm.steps;
+          if (typeof parsedSteps === 'string') {
+             parsedSteps = parsedSteps.split('\n').map(s => s.trim()).filter(Boolean);
+          }
+
+          const finalForm = { 
+            ...recipeForm, 
+            id: recId,
+            ingredients: parsedIngredients,
+            steps: parsedSteps
+          };
+          
+          await setDoc(doc(db, 'recipes', recId), finalForm);
+          showToast(isEditing ? 'Recipe successfully modified.' : 'New recipe created.');
+          setIsRecipeModalOpen(false);
+          setEditingRecipe(null);
+          loadDataForTab();
+        } else {
+          showToast('Sandbox mode: Firebase is disconnected. Edits not saved.');
+          setTimeout(() => setIsRecipeModalOpen(false), 800);
+        }
+      } catch (err) {
+        console.error('Failed to submit recipe:', err);
+        showToast('Error saving recipe.');
+      } finally {
+        setSubmitting(false);
+      }
+    };
+
     const handleCategorySubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       setSubmitting(true);
@@ -1496,6 +1562,16 @@
                 <span>Categories</span>
               </button>
 
+              <button
+                onClick={() => setActiveTab('recipes')}
+                className={`w-full flex items-center space-x-2.5 py-2.5 px-3 rounded-xl text-xs font-mono font-bold uppercase transition-all tracking-wider ${
+                  activeTab === 'recipes' ? 'bg-[#A61B1B] text-white' : 'hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                <BookOpen className="w-4 h-4 shrink-0" />
+                <span>Recipes</span>
+              </button>
+
               <span className="block px-2 text-[8px] font-mono font-black tracking-[0.25em] text-slate-500 uppercase mt-4 mb-1.5">
                 E-Commerce Logs
               </span>
@@ -2162,6 +2238,104 @@
                         </table>
                       </div>
 
+                    </div>
+                  )}
+
+
+                  
+                  {/* ========================================== */}
+                  {/* 3.5 RECIPES MODULE */}
+                  {/* ========================================== */}
+                  {activeTab === 'recipes' && (
+                    <div className="space-y-4 animate-fadeIn">
+                      
+                      <div className="bg-white p-4 rounded-2xl border border-slate-150 shadow-sm flex items-center justify-between text-left">
+                        <span className="text-xs font-mono text-slate-500">
+                          *Add and manage your authentic recipes and cooking guides.
+                        </span>
+                        <button
+                          onClick={() => {
+                            setEditingRecipe(null);
+                            setRecipeForm({ id: '', title: '', prepTime: '', cookTime: '', difficulty: 'Easy', servings: 4, ingredients: '', steps: '', description: '', image: '' });
+                            setIsRecipeModalOpen(true);
+                          }}
+                          className="px-4 py-2 bg-[#A61B1B] hover:bg-red-800 text-white rounded-xl text-xs font-bold font-mono tracking-wider transition-all flex items-center space-x-2 shrink-0"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span>Add Recipe</span>
+                        </button>
+                      </div>
+
+                      <div className="bg-white rounded-2xl border border-slate-150 overflow-hidden shadow-sm">
+                        <div className="overflow-x-auto text-left">
+                          <table className="w-full text-sm font-sans">
+                            <thead>
+                              <tr className="bg-slate-50/50 border-b border-slate-100 text-[9px] font-mono font-black tracking-[0.2em] text-slate-400 uppercase">
+                                <th className="px-6 py-4 font-semibold w-12">Photo</th>
+                                <th className="px-6 py-4 font-semibold">Recipe Details</th>
+                                <th className="px-6 py-4 font-semibold text-center">Difficulty</th>
+                                <th className="px-6 py-4 font-semibold text-right">Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                              {recipes.map(recipe => (
+                                <tr key={recipe.id} className="hover:bg-slate-50/50 transition-colors">
+                                  <td className="px-6 py-4">
+                                    <div className="w-12 h-12 rounded-xl bg-slate-100 overflow-hidden shadow-sm border border-slate-200">
+                                      <img 
+                                        src={recipe.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'} 
+                                        alt={recipe.title} 
+                                        className="w-full h-full object-cover"
+                                      />
+                                    </div>
+                                  </td>
+                                  <td className="px-6 py-4">
+                                    <div className="font-bold text-slate-800 text-sm">{recipe.title}</div>
+                                    <div className="text-xs text-slate-500 mt-1 line-clamp-1">{recipe.description}</div>
+                                  </td>
+                                  <td className="px-6 py-4 text-center">
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600">
+                                      {recipe.difficulty}
+                                    </span>
+                                  </td>
+                                  <td className="px-6 py-4 text-right">
+                                    <div className="flex items-center justify-end space-x-2">
+                                      <button
+                                        onClick={() => {
+                                          setEditingRecipe(recipe);
+                                          setRecipeForm({
+                                            id: recipe.id,
+                                            title: recipe.title,
+                                            prepTime: recipe.prepTime,
+                                            cookTime: recipe.cookTime,
+                                            difficulty: recipe.difficulty,
+                                            servings: recipe.servings,
+                                            ingredients: Array.isArray(recipe.ingredients) ? recipe.ingredients.join(', ') : recipe.ingredients,
+                                            steps: Array.isArray(recipe.steps) ? recipe.steps.join('\n') : recipe.steps,
+                                            description: recipe.description,
+                                            image: recipe.image
+                                          });
+                                          setIsRecipeModalOpen(true);
+                                        }}
+                                        className="px-3 py-1.5 rounded-lg border border-slate-200 text-[10px] font-bold font-mono tracking-wider text-slate-600 hover:border-slate-300 hover:bg-slate-50 transition-colors"
+                                      >
+                                        Edit
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))}
+                              {recipes.length === 0 && (
+                                <tr>
+                                  <td colSpan={4} className="px-6 py-12 text-center text-slate-500 text-sm">
+                                    No recipes found. Add your first recipe.
+                                  </td>
+                                </tr>
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
                     </div>
                   )}
 

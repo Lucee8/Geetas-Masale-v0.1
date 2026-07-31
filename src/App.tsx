@@ -21,8 +21,8 @@ import AdminDashboard from './components/AdminDashboard';
 import AuthModal from './components/AuthModal';
 import MyAccountDashboard from './components/MyAccountDashboard';
 import { useUser } from './context/UserContext';
-import { Product } from './types';
-import { PRODUCTS, CATEGORIES } from './data/storeData';
+import { Product, Recipe } from './types';
+import { PRODUCTS, CATEGORIES, RECIPES } from './data/storeData';
 import { isFirebaseConfigured, db, seedDatabaseIfEmpty, isVercel } from './lib/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 
@@ -49,6 +49,7 @@ export default function App() {
   // Full-stack dynamic data lists
   const [productsList, setProductsList] = useState<Product[]>([]);
   const [categoriesList, setCategoriesList] = useState<any[]>([]);
+  const [recipesList, setRecipesList] = useState<Recipe[]>([]);
   const checkIsAdmin = () => {
     if (typeof window === 'undefined') return false;
     const path = window.location.pathname.toLowerCase().replace(/\/$/, '');
@@ -131,6 +132,7 @@ export default function App() {
       if (isVercel) {
         setProductsList(PRODUCTS);
         setCategoriesList(CATEGORIES);
+        setRecipesList(RECIPES);
         setLoading(false);
         return;
       }
@@ -174,10 +176,13 @@ export default function App() {
       if (!gotCategories) {
         setCategoriesList(CATEGORIES);
       }
+      setRecipesList(RECIPES); // always default recipes for API flow if not implemented there
+      
     } catch (e) {
       console.error("Failed to load products/categories from express DB APIs, falling back to local:", e);
       setProductsList(PRODUCTS);
       setCategoriesList(CATEGORIES);
+      setRecipesList(RECIPES);
     } finally {
       setLoading(false);
     }
@@ -344,7 +349,7 @@ export default function App() {
 
       <Heritage />
 
-      <RecipeSection />
+      <RecipeSection recipesList={recipesList} />
 
       <WhyChooseUs />
 
