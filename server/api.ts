@@ -559,6 +559,34 @@ router.delete('/admin/orders/:id', authenticateJWT, authorizeRoles(['Super Admin
 });
 
 
+
+// --- Recipes Admin Endpoints ---
+router.post('/admin/recipes', authenticateJWT, authorizeRoles(['Super Admin', 'Manager']), (req, res) => {
+  const recipes = getRecipes();
+  const newRecipe = { id: `r_${Date.now()}`, ...req.body };
+  recipes.push(newRecipe);
+  saveRecipes(recipes);
+  res.status(201).json(newRecipe);
+});
+
+router.put('/admin/recipes/:id', authenticateJWT, authorizeRoles(['Super Admin', 'Manager']), (req, res) => {
+  const recipes = getRecipes();
+  const index = recipes.findIndex(r => r.id === req.params.id);
+  if (index === -1) return res.status(404).json({ error: 'Recipe not found' });
+  
+  recipes[index] = { ...recipes[index], ...req.body };
+  saveRecipes(recipes);
+  res.json(recipes[index]);
+});
+
+router.delete('/admin/recipes/:id', authenticateJWT, authorizeRoles(['Super Admin', 'Manager']), (req, res) => {
+  const recipes = getRecipes();
+  const filtered = recipes.filter(r => r.id !== req.params.id);
+  saveRecipes(filtered);
+  res.json({ message: 'Recipe deleted successfully' });
+});
+
+
 // -- Customer Audit Trails (STEP 8) --
 router.get('/admin/customers', authenticateJWT, (req, res) => {
   const orders = getOrders();

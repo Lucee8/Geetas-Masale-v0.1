@@ -156,6 +156,26 @@ Please confirm availability and sharing banking details for packing. Thanks!`;
 
         {/* Categories are handled elegantly via the 3D category cards in the Hero section above */}
 
+        {/* Category Filter Tabs */}
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-10">
+          {filterTabs.map((tab) => {
+            const isActive = selectedCategory.toLowerCase() === tab.id.toLowerCase();
+            return (
+              <button
+                key={tab.id}
+                onClick={() => onSelectCategory(tab.id)}
+                className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold uppercase transition-all duration-300 shadow-sm border ${
+                  isActive
+                    ? 'bg-[#A61B1B] text-white border-[#A61B1B] scale-105'
+                    : 'bg-white text-slate-600 border-gray-200 hover:border-[#A61B1B] hover:text-[#A61B1B]'
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
         {/* Empty Search State fallback */}
         {filteredProducts.length === 0 && (
           <motion.div
@@ -208,7 +228,7 @@ Please confirm availability and sharing banking details for packing. Thanks!`;
 
                     {/* Left category tab label */}
                     <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-[#A61B1B] text-white text-[8px] sm:text-[10px] font-mono tracking-wider sm:tracking-widest px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full uppercase border border-white/20 backdrop-blur-sm shadow-sm select-none">
-                      {p.category}
+                      {filterTabs.find(t => t.id === p.category)?.label.replace(/\s*\(.*?\)\s*/g, '') || p.category}
                     </div>
 
                     {/* Weight tag pill */}
