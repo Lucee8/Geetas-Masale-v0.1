@@ -87,22 +87,12 @@ export async function seedDatabaseIfEmpty() {
       for (const cat of CATEGORIES) {
         await setDoc(doc(db, 'categories', cat.id), cat);
       }
-    } else {
-      const existingIds = new Set(catSnap.docs.map(d => d.id));
-      const missingCats = CATEGORIES.filter(c => !existingIds.has(c.id));
-      if (missingCats.length > 0) {
-        console.log(`Seeding ${missingCats.length} missing categories to Firestore...`);
-        for (const cat of missingCats) {
-          await setDoc(doc(db, 'categories', cat.id), cat);
-        }
-      }
     }
 
     // 2. Check & Seed Products
     const prodSnap = await getDocs(collection(db, 'products'));
     if (prodSnap.empty) {
       console.log("Seeding products to Firestore...");
-      // Firestore batches can write up to 500 documents
       const batch = writeBatch(db);
       PRODUCTS.forEach((prod) => {
         const docRef = doc(db, 'products', prod.id);
@@ -110,23 +100,6 @@ export async function seedDatabaseIfEmpty() {
       });
       await batch.commit();
       console.log("Successfully seeded all products!");
-    } else {
-      const existingIds = new Set(prodSnap.docs.map(d => d.id));
-      const missingProducts = PRODUCTS.filter(p => !existingIds.has(p.id));
-      if (missingProducts.length > 0) {
-        console.log(`Seeding ${missingProducts.length} missing products to Firestore...`);
-        const batch = writeBatch(db);
-        let count = 0;
-        missingProducts.forEach((prod) => {
-          if (count < 500) {
-            const docRef = doc(db, 'products', prod.id);
-            batch.set(docRef, prod);
-            count++;
-          }
-        });
-        await batch.commit();
-        console.log("Successfully seeded missing products!");
-      }
     }
 
     // 2.5 Check & Seed Recipes
@@ -140,25 +113,7 @@ export async function seedDatabaseIfEmpty() {
       });
       await recipeBatch.commit();
       console.log("Successfully seeded recipes!");
-    } else if (typeof RECIPES !== 'undefined' && Array.isArray(RECIPES) && RECIPES.length > 0) {
-      const existingIds = new Set(recSnap.docs.map(d => d.id));
-      const missingRecipes = RECIPES.filter(r => !existingIds.has(r.id));
-      if (missingRecipes.length > 0) {
-        console.log(`Seeding ${missingRecipes.length} missing recipes to Firestore...`);
-        const recipeBatch = writeBatch(db);
-        let count = 0;
-        missingRecipes.forEach((rec) => {
-          if (count < 500) {
-            const docRef = doc(db, 'recipes', rec.id);
-            recipeBatch.set(docRef, rec);
-            count++;
-          }
-        });
-        await recipeBatch.commit();
-        console.log("Successfully seeded missing recipes!");
-      }
-    }
-
+    } 
 
     // 3. Check & Seed default settings
     const settingsSnap = await getDoc(doc(db, 'settings', 'store_settings'));

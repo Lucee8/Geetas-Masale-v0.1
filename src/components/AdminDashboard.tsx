@@ -2278,7 +2278,7 @@ const handleCategorySubmit = async (e: React.FormEvent) => {
                                 </td>
 
                                 <td className="px-4 py-3 text-center font-mono font-black text-slate-700 text-xs">
-                                  {c.count || 0} Listed Items
+                                  {products.filter((p: any) => p.category === c.name || p.category === c.id).length} Listed Items
                                 </td>
 
                                 <td className="px-4 py-3 text-center">
