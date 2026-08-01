@@ -4,6 +4,7 @@
    */
 
   import React, { useState, useEffect } from 'react';
+  import PaymentSettings from './PaymentSettings';
   import { motion } from 'motion/react';
   import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
   import { 
@@ -47,7 +48,7 @@
     const [adminUser, setAdminUser] = useState<any>(null);
 
     // Active Tab
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'categories' | 'recipes' | 'orders' | 'customers' | 'reviews' | 'settings' | 'coupons'>('dashboard');
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'categories' | 'recipes' | 'orders' | 'customers' | 'reviews' | 'settings' | 'coupons' | 'payment'>('dashboard');
 
     // API Data Status
     const [analytics, setAnalytics] = useState<any>(null);
@@ -841,14 +842,14 @@
       e.preventDefault();
       setSubmitting(true);
       try {
-        let parsedIngredients = recipeForm.ingredients;
-        if (typeof parsedIngredients === 'string') {
-           parsedIngredients = parsedIngredients.split(',').map(s => s.trim()).filter(Boolean);
-        }
-        let parsedSteps = recipeForm.steps;
-        if (typeof parsedSteps === 'string') {
-           parsedSteps = parsedSteps.split('\n').map(s => s.trim()).filter(Boolean);
-        }
+        const parsedIngredients = recipeForm.ingredients
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean);
+        const parsedSteps = recipeForm.steps
+          .split('\n')
+          .map(s => s.trim())
+          .filter(Boolean);
 
         const isEditing = !!editingRecipe;
         const recId = isEditing ? editingRecipe.id : `r_${Date.now()}`;
@@ -1698,6 +1699,15 @@ const handleCategorySubmit = async (e: React.FormEvent) => {
               >
                 <Settings className="w-4 h-4 shrink-0" />
                 <span>Shop Properties</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('payment')}
+                className={`w-full flex items-center space-x-2.5 py-2.5 px-3 rounded-xl text-xs font-mono font-bold uppercase transition-all tracking-wider ${
+                  activeTab === 'payment' ? 'bg-[#A61B1B] text-white' : 'hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                <CreditCard className="w-4 h-4 shrink-0" />
+                <span>Payment Settings</span>
               </button>
             </nav>
 
@@ -3223,6 +3233,7 @@ const handleCategorySubmit = async (e: React.FormEvent) => {
                   {/* ========================================== */}
                   {/* 8. WEBSITE SETTINGS (STEP 14)             */}
                   {/* ========================================== */}
+                  {activeTab === 'payment' && <PaymentSettings />}
                   {activeTab === 'settings' && settings && (
                     <form onSubmit={handleSettingsSubmit} className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-150 shadow-sm text-left font-sans space-y-5 animate-fadeIn">
                       
@@ -3262,14 +3273,12 @@ const handleCategorySubmit = async (e: React.FormEvent) => {
 
                         <div>
                           <label className="block text-[10px] font-mono text-slate-400 uppercase font-black tracking-widest mb-1.5">
-                            UPI Billing VPA Address (For client checkouts):
+                            Payment Settings Moved:
                           </label>
-                          <input
-                            type="text"
-                            value={settings.upiId}
-                            onChange={e => setSettings((prev: any) => ({ ...prev, upiId: e.target.value }))}
-                            className="w-full px-4.5 py-3 rounded-xl border border-slate-200 text-xs font-mono text-slate-700 bg-amber-50/20 focus:outline-none focus:ring-1 focus:ring-[#A61B1B]"
-                          />
+                          <div className="w-full px-4.5 py-3 rounded-xl border border-slate-200 text-xs font-mono text-slate-500 bg-slate-50">
+                            Please use the dedicated "Payment Settings" tab to configure UPI, QR Code, and amounts.
+                          </div>
+
                         </div>
 
                         <div>

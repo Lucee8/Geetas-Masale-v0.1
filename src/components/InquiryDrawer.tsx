@@ -259,7 +259,11 @@ export default function InquiryDrawer({
       : Number(customAmount) || 0;
 
   // Generate UPI deep link URI with required parameters
-  const upiString = `upi://pay?pa=bhavesh62006@fam&pn=Geetas%20Masale&am=${payAmount}&cu=INR`;
+  const pUpiId = 'bhavesh62006@fam';
+  const pMerchant = 'Geetas Masale';
+  const pNote = 'Order Payment';
+  const upiPayAmount = payAmount;
+  const upiString = `upi://pay?pa=${pUpiId}&pn=${encodeURIComponent(pMerchant)}&am=${upiPayAmount}&cu=INR&tn=${encodeURIComponent(pNote)}`;
   
   // Real dynamic live QR code generation endpoint
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiString)}&color=A61B1B&bgcolor=FFFFFF`;
@@ -428,7 +432,7 @@ export default function InquiryDrawer({
   };
 
   const handleCopyUPI = () => {
-    navigator.clipboard.writeText('bhavesh62006@fam');
+    navigator.clipboard.writeText(pUpiId);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -1022,7 +1026,7 @@ export default function InquiryDrawer({
                         <div className="w-full bg-[#A61B1B]/5 rounded-xl p-2.5 border border-[#A61B1B]/15 flex items-center justify-between text-xs font-mono">
                           <div className="flex flex-col text-left">
                             <span className="text-[9px] text-[#A61B1B]/70 uppercase font-black">Store UPI ID</span>
-                            <span className="font-bold text-slate-800 text-xs">bhavesh62006@fam</span>
+                            <span className="font-bold text-slate-800 text-xs">{pUpiId}</span>
                           </div>
                           <button
                             onClick={handleCopyUPI}
@@ -1047,7 +1051,7 @@ export default function InquiryDrawer({
                       </div>
                       <ol className="text-[9.5px] font-sans text-slate-600 space-y-0.5 list-decimal list-inside pl-1">
                         <li>Tap the pay button above or scan the QR Code.</li>
-                        <li>Pay the configured <strong className="text-[#A61B1B]">₹{payAmount}</strong> on GPay/PhonePe.</li>
+                        <li>Pay the configured <strong className="text-[#A61B1B]">₹{upiPayAmount}</strong> on GPay/PhonePe.</li>
                         <li>Click below to confirm your address & order details on WhatsApp.</li>
                       </ol>
                     </div>
@@ -1138,7 +1142,7 @@ export default function InquiryDrawer({
                         <div className="grid grid-cols-2 gap-2">
                           {/* Google Pay */}
                           <a
-                            href={`gpay://upi/pay?pa=bhavesh62006@fam&pn=Geetas%20Masale&am=${payAmount}&cu=INR`}
+                            href={`gpay://upi/pay?pa=${pUpiId}&pn=${encodeURIComponent(pMerchant)}&am=${upiPayAmount}&cu=INR&tn=${encodeURIComponent(pNote)}`}
                             onClick={() => {
                               submitOrderToBackend('UPI', payAmount);
                               setTimeout(() => {
@@ -1153,7 +1157,7 @@ export default function InquiryDrawer({
 
                           {/* PhonePe */}
                           <a
-                            href={`phonepe://upi/pay?pa=bhavesh62006@fam&pn=Geetas%20Masale&am=${payAmount}&cu=INR`}
+                            href={`phonepe://upi/pay?pa=${pUpiId}&pn=${encodeURIComponent(pMerchant)}&am=${upiPayAmount}&cu=INR&tn=${encodeURIComponent(pNote)}`}
                             onClick={() => {
                               submitOrderToBackend('UPI', payAmount);
                               setTimeout(() => {
@@ -1168,7 +1172,7 @@ export default function InquiryDrawer({
 
                           {/* Paytm */}
                           <a
-                            href={`paytmmp://upi/pay?pa=bhavesh62006@fam&pn=Geetas%20Masale&am=${payAmount}&cu=INR`}
+                            href={`paytmmp://upi/pay?pa=${pUpiId}&pn=${encodeURIComponent(pMerchant)}&am=${upiPayAmount}&cu=INR&tn=${encodeURIComponent(pNote)}`}
                             onClick={() => {
                               submitOrderToBackend('UPI', payAmount);
                               setTimeout(() => {
@@ -1183,7 +1187,7 @@ export default function InquiryDrawer({
 
                           {/* BHIM UPI */}
                           <a
-                            href={`bhim://upi/pay?pa=bhavesh62006@fam&pn=Geetas%20Masale&am=${payAmount}&cu=INR`}
+                            href={`bhim://upi/pay?pa=${pUpiId}&pn=${encodeURIComponent(pMerchant)}&am=${upiPayAmount}&cu=INR&tn=${encodeURIComponent(pNote)}`}
                             onClick={() => {
                               submitOrderToBackend('UPI', payAmount);
                               setTimeout(() => {
@@ -1238,7 +1242,7 @@ export default function InquiryDrawer({
                           className="w-full inline-flex items-center justify-center space-x-2.5 py-4 rounded-xl bg-[#A61B1B] hover:bg-rose-950 text-white text-xs font-sans font-black tracking-widest uppercase transition-all shadow-[0_10px_25px_rgba(166,27,27,0.15)] text-center active:scale-[0.98] cursor-pointer"
                         >
                           <Smartphone className="w-4 h-4 animate-pulse shrink-0 text-white" />
-                          <span>Pay via UPI App (₹{payAmount})</span>
+                          <span>Pay via UPI App (₹{upiPayAmount})</span>
                         </a>
 
                         {/* Track Order on WhatsApp */}

@@ -22,6 +22,7 @@ import {
   limit,
   writeBatch
 } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 import { PRODUCTS, CATEGORIES, RECIPES } from '../data/storeData';
 
 const getFirebaseConfig = () => {
@@ -64,12 +65,15 @@ export const isProduction = typeof window !== 'undefined' && window.location.hos
 let app;
 export let auth: any = null;
 export let db: any = null;
+export let storage: any = null;
+
 
 if (isFirebaseConfigured) {
   try {
     app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
     auth = getAuth(app);
     db = getFirestore(app);
+    storage = getStorage(app);
   } catch (error) {
     console.error("Failed to initialize Firebase:", error);
   }
@@ -80,6 +84,11 @@ export async function seedDatabaseIfEmpty() {
   if (!isFirebaseConfigured || !db) return;
 
   try {
+    const seedFlagSnap = await getDoc(doc(db, 'settings', 'seeded_flag'));
+    if (seedFlagSnap.exists() && seedFlagSnap.data().seeded) return;
+    
+    await setDoc(doc(db, 'settings', 'seeded_flag'), { seeded: true });
+
     // 1. Check & Seed Categories
     const catSnap = await getDocs(collection(db, 'categories'));
     if (catSnap.empty) {
