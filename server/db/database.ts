@@ -51,7 +51,8 @@ export interface Category {
   description: string;
   image: string;
   count: number;
-  hidden: boolean;
+  // Optional for backwards-compatible seed and persisted data.
+  hidden?: boolean;
 }
 
 export interface Product {
@@ -60,15 +61,17 @@ export interface Product {
   name: string;
   weight: string;
   mrp: number;
-  ratePerKg: number;
+  // Older products may not have a per-kilogram rate.
+  ratePerKg?: number;
   description: string;
   ingredients: string;
   usage: string;
   shelfLife: string;
   notes: string;
   image: string;
-  stock: number;
-  isBestseller: boolean;
+  // These fields were added after the initial in-file product seeds.
+  stock?: number;
+  isBestseller?: boolean;
 }
 
 export interface OrderItem {
