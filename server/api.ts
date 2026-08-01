@@ -14,7 +14,7 @@ import {
   getPayments, savePayments,
   getReviews, saveReviews,
   getContactMessages, saveContactMessages,
-  getWebsiteSettings, saveWebsiteSettings,
+  getWebsiteSettings, saveWebsiteSettings, getPaymentSettings, savePaymentSettings,
   getBanners, saveBanners,
   getRecipes, saveRecipes,
   getCoupons, saveCoupons,
@@ -672,6 +672,21 @@ router.delete('/api/admin/contact/:id', authenticateJWT, authorizeRoles(['Super 
   res.json({ message: 'Inquiry message removed.' });
 });
 
+
+
+router.get('/settings/payment', (req, res) => {
+  res.json(getPaymentSettings());
+});
+
+router.post('/admin/settings/payment', authenticateJWT, authorizeRoles(['Super Admin', 'Manager']), (req, res) => {
+  const current = getPaymentSettings();
+  const updatedSettings = {
+    ...current,
+    ...req.body
+  };
+  savePaymentSettings(updatedSettings);
+  res.json({ message: 'Payment settings updated successfully.', settings: updatedSettings });
+});
 
 // -- Web configuration updates (STEP 14) --
 router.post('/admin/settings', authenticateJWT, authorizeRoles(['Super Admin', 'Manager']), (req, res) => {

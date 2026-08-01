@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Upload, Trash2, CheckCircle, Save, Smartphone, QrCode, CreditCard, Copy, RefreshCw } from 'lucide-react';
-import { db, storage } from '../lib/firebase';
+import { db, storage, isFirebaseConfigured } from '../lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
@@ -25,9 +25,17 @@ export default function PaymentSettings() {
 
   const fetchSettings = async () => {
     try {
+        if (isFirebaseConfigured && db) {
       const snap = await getDoc(doc(db, 'settings', 'payment_settings'));
       if (snap.exists()) {
         setSettings(prev => ({ ...prev, ...snap.data() }));
+                }
+      } else {
+        const res = await fetch('/api/settings/payment');
+        if (res.ok) {
+          const data = await res.json();
+          setSettings(prev => ({ ...prev, ...data }));
+        }
       }
     } catch (err) {
       console.error(err);
@@ -47,8 +55,25 @@ export default function PaymentSettings() {
     }
     setSaving(true);
     try {
+    if (isFirebaseConfigured && db) {
       await setDoc(doc(db, 'settings', 'payment_settings'), settings, { merge: true });
       showToast('Payment settings saved successfully!', 'success');
+        } else {
+        const token = localStorage.getItem('gm_admin_token') || '';
+        const res = await fetch('/api/admin/settings/payment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(settings)
+        });
+        if (res.ok) {
+          showToast('Payment settings saved successfully!', 'success');
+        } else {
+          throw new Error('API Error');
+        }
+      }
     } catch (err) {
       console.error(err);
       showToast('Failed to save settings.', 'error');
@@ -65,11 +90,21 @@ export default function PaymentSettings() {
       return;
     }
     
-    if (!storage) {
+    if (isFirebaseConfigured && !storage) {
       showToast('Storage not configured', 'error');
       return;
     }
 
+    if (!isFirebaseConfigured) {
+      // Dummy upload for local mode
+      setUploadProgress(100);
+      setTimeout(() => {
+        setSettings(prev => ({ ...prev, qrImage: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=example&color=A61B1B' }));
+        setUploadProgress(0);
+        showToast('QR Uploaded successfully (Local Mode Mock)', 'success');
+      }, 1000);
+      return;
+    }
     const storageRef = ref(storage, `payment_qrs/${Date.now()}_${file.name}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
 

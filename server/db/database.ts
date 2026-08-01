@@ -851,6 +851,16 @@ export const savePayments = (payments: Payment[]) => writeDataFile('payments.jso
 export const getReviews = () => readDataFile<Review[]>('reviews.json', DEFAULT_REVIEWS);
 export const saveReviews = (reviews: Review[]) => writeDataFile('reviews.json', reviews);
 
+export const getPaymentSettings = () => readDataFile<any>('payment_settings.json', {
+    upiId: '',
+    qrImage: '',
+    merchantName: '',
+    paymentNote: 'Order Payment',
+    amountBehavior: 'dynamic',
+    fixedAmount: ''
+});
+export const savePaymentSettings = (settings: any) => writeDataFile('payment_settings.json', settings);
+
 export const getContactMessages = () => readDataFile<ContactMessage[]>('contact_messages.json', []);
 export const saveContactMessages = (messages: ContactMessage[]) => writeDataFile('contact_messages.json', messages);
 

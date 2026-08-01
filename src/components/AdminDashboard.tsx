@@ -1756,7 +1756,7 @@ const handleCategorySubmit = async (e: React.FormEvent) => {
                 </span>
                 <span className="hidden md:inline-flex items-center space-x-1.5 text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-[#EBFDFB] text-[#1E6B65] border border-[#C6F7F2] uppercase tracking-wide">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#1E6B65] animate-pulse"></span>
-                  <span>Production Store Synced</span>
+                  <span>{isFirebaseConfigured ? 'Production Store Synced' : 'Local Sandbox Mode'}</span>
                 </span>
               </div>
 
