@@ -1086,7 +1086,7 @@ export default function InquiryDrawer({
                       <ol className="text-[9.5px] font-sans text-slate-600 space-y-0.5 list-decimal list-inside pl-1">
                         <li>Tap the pay button above or scan the QR Code.</li>
                         <li>Pay the configured <strong className="text-[#A61B1B]">₹{activeAmount}</strong> on GPay/PhonePe.</li>
-                        <li>Click below to confirm your address & order details on WhatsApp.</li>
+                        <li>Click below to confirm your address and order details on WhatsApp. Please also share a screenshot of the completed payment to confirm your order.</li>
                       </ol>
                     </div>
                   </div>
@@ -1256,7 +1256,7 @@ export default function InquiryDrawer({
                           className="w-full mt-2.5 inline-flex items-center justify-center space-x-2 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-sans font-black tracking-widest uppercase transition-all shadow-md text-center cursor-pointer"
                         >
                           <MessageSquare className="w-3.5 h-3.5 shrink-0 text-white fill-current" />
-                          <span>Track Order on WhatsApp</span>
+                          <span>Confirm Order & Share Payment Screenshot</span>
                         </button>
                       </div>
                     ) : (
@@ -1285,7 +1285,7 @@ export default function InquiryDrawer({
                           className="w-full mt-3 inline-flex items-center justify-center space-x-2.5 py-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-sans font-black tracking-widest uppercase transition-all shadow-[0_10px_25px_rgba(16,185,129,0.15)] text-center active:scale-[0.98] cursor-pointer"
                         >
                           <MessageSquare className="w-4 h-4 shrink-0 text-white fill-current" />
-                          <span>Track Order on WhatsApp</span>
+                          <span>Confirm Order & Share Payment Screenshot</span>
                         </button>
 
                         <p className="text-[9px] font-sans text-center text-gray-400 select-none pt-1 leading-normal">
