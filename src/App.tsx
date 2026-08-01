@@ -109,7 +109,11 @@ export default function App() {
           const catSnap = await getDocs(collection(db, 'categories'));
 
           const products = prodSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Product[];
-          const categories = catSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          const categories = catSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => {
+            const indexA = CATEGORIES.findIndex(c => c.id === a.id);
+            const indexB = CATEGORIES.findIndex(c => c.id === b.id);
+            return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+          });
           const recSnap = await getDocs(collection(db, 'recipes'));
           const recipes = recSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Recipe[];
           

@@ -67,8 +67,8 @@ export interface Product {
   shelfLife: string;
   notes: string;
   image: string;
-  stock?: number;
-  isBestseller?: boolean;
+  stock: number;
+  isBestseller: boolean;
 }
 
 export interface OrderItem {
@@ -179,40 +179,35 @@ const DEFAULT_CATEGORIES: Category[] = [
     name: 'Malvani Masalas & Chutneys',
     description: 'Generations of expertise in roasting and blending coastal spices, red chillies, and garlic.',
     image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&auto=format&fit=crop&q=80',
-    count: 11,
-    hidden: false
+    count: 11
   },
   {
     id: 'Pith',
     name: 'Traditional Flours (Pith)',
     description: 'Freshly milled rice, pulse, and grain flours prepared for authentic Bhakri, Vade, and Modak.',
     image: 'https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=600&auto=format&fit=crop&q=80',
-    count: 7,
-    hidden: false
+    count: 7
   },
   {
     id: 'Malvani products',
     name: 'Konkan Specialties & Meva',
     description: 'Sun-dried Kokum, parboiled rice, fruit leathers (Poli), and authentic farm-fresh items.',
     image: 'https://images.unsplash.com/photo-1626132647523-66f5bf380027?w=600&auto=format&fit=crop&q=80',
-    count: 11,
-    hidden: false
-  },
-  {
-    id: 'Laddoos',
-    name: 'Handmade Laddoos',
-    description: 'Sweet, nutritious daily delicacies rolled with pure ghee, organic jaggery, peanuts, and dry fruits.',
-    image: 'https://images.unsplash.com/photo-1581781868311-6415779c13dd?w=600&auto=format&fit=crop&q=80',
-    count: 4,
-    hidden: false
+    count: 11
   },
   {
     id: 'Kaju',
     name: 'Premium Malvan Cashews (Kaju)',
     description: 'Export-grade whole cashews, salted variants, masala-flavored crunch, and healthy split kernels.',
     image: '/src/assets/images/cashew_premium_1780594672474.png',
-    count: 7,
-    hidden: false
+    count: 7
+  },
+  {
+    id: 'Laddoos',
+    name: 'Handmade Laddoos',
+    description: 'Sweet, nutritious daily delicacies rolled with pure ghee, organic jaggery, peanuts, and dry fruits.',
+    image: 'https://images.unsplash.com/photo-1581781868311-6415779c13dd?w=600&auto=format&fit=crop&q=80',
+    count: 4
   }
 ];
 
@@ -322,7 +317,6 @@ const DEFAULT_PRODUCTS: Product[] = [
     name: 'Khobra Lasun Chutney',
     weight: '200gm',
     mrp: 120,
-    ratePerKg: 600,
     description: 'A coarse, dry, punchy side-dish chutney made from premium dried coconut flakes and spicy raw garlic cloves.',
     ingredients: 'Graded Dry Coconut, Peeled Malvan Garlic, Red Chilli Flakes, Sea Salt',
     usage: 'Ready to consume. Best enjoyed alongside freshly made hot Bajra/Jowar Bhakris, Vada Pav, or simply mixed with oil over warm rice.',
@@ -508,7 +502,6 @@ const DEFAULT_PRODUCTS: Product[] = [
     name: 'Homemade Gul Khobravadi',
     weight: '1 unit (Approx 300g)',
     mrp: 90,
-    ratePerKg: 300,
     description: 'Traditional sweets crafted with absolute purity, mixing fresh wet-grated coconut milk, rich dark organic jaggery, and cardamom.',
     ingredients: 'Wet-grated Coconut, Organic Sugarcane Jaggery, Pure Cow Ghee, Green Cardamom seeds',
     usage: 'Ready to eat sweet treat post meals or as healthy dessert snacks during the day.',
@@ -522,7 +515,6 @@ const DEFAULT_PRODUCTS: Product[] = [
     name: 'Taak Mirchi',
     weight: '1 packet',
     mrp: 70,
-    ratePerKg: 70,
     description: 'Mild green hot pepper lines soaked in sour salted buttermilk, cured under heavy sun till they shrink to white-golden crisp crusts.',
     ingredients: 'Punctured Green Chillies, Fermented Cow Buttermilk, Graded Rock Salt',
     usage: 'Deep fry in hot oil for 5-10 seconds until they turn dark brown. Serve instantly alongside dal-rice or khichdi.',
@@ -536,7 +528,6 @@ const DEFAULT_PRODUCTS: Product[] = [
     name: 'Sandgi Mirchi',
     weight: '1 packet',
     mrp: 70,
-    ratePerKg: 70,
     description: 'Hand-split chillies stuffed with toasted Fenugreek, Cumin, Mustard, and Turmeric, soaked in salted buttermilk and thoroughly sun-dried.',
     ingredients: 'Thick local Green Peppers, Fenugreek seeds, Cumin seeds, Turmeric, Buttermilk, Salt',
     usage: 'Fry in hot oil until charcoal brown and crunchy. Crush over flatbreads or plain curd rice.',
@@ -550,7 +541,6 @@ const DEFAULT_PRODUCTS: Product[] = [
     name: 'Awala Candy 100 gm',
     weight: '100gm',
     mrp: 40,
-    ratePerKg: 400,
     description: 'Delectable sweet and tangy segments of fleshy gooseberries saturated with sugar juice and sun-dehydrated. Juicy and chewy.',
     ingredients: 'Fresh Indian Gooseberry (Amla) pulp, Granulated Sugar, Citric acid',
     usage: 'Ready to eat digestive aid. Chew a couple of candies post meal for cooling and fresh digestion.',
@@ -564,7 +554,6 @@ const DEFAULT_PRODUCTS: Product[] = [
     name: 'Fanas Wafers',
     weight: '1 packet (Approx 150gm)',
     mrp: 90,
-    ratePerKg: 600,
     description: 'Extravagantly crunchy, bright-yellow salty snacks made by slicing raw, firm flesh of Konkan jackfruits.',
     ingredients: 'Raw Jackfruit slices, Double-refined Edible Vegetable Oil, Graded Sea Salt',
     usage: 'Ready to consume crispy tea-time savory snack.',
@@ -578,7 +567,6 @@ const DEFAULT_PRODUCTS: Product[] = [
     name: 'Gavthi Poha',
     weight: '1 packet (Approx 250gm)',
     mrp: 70,
-    ratePerKg: 280,
     description: 'Thick, rustically flattened brown rice flakes, retaining wholesome fiber. Offers deep mineral goodness.',
     ingredients: 'Earthy local paddy parboiled rice grains',
     usage: 'Wash, drain (let water soak in for 10 mins), and prepare standard traditional Kanda Poha with mustard, chillies, and yellow turmeric.',
@@ -592,7 +580,6 @@ const DEFAULT_PRODUCTS: Product[] = [
     name: 'Amba Poli',
     weight: '1 packet (Approx 200gm)',
     mrp: 90,
-    ratePerKg: 450,
     description: 'True Alphonso Mango fruit leather. Fresh sweet mango pulp concentrated layer by layer on bamboo mats under pure coastal sun beams.',
     ingredients: 'Authentic Devgad Alphonso Mango Pulp, Granulated Sugar',
     usage: 'Ready to consume. Cut into square sheets and enjoy as clean natural mango candy slices.',
@@ -606,7 +593,6 @@ const DEFAULT_PRODUCTS: Product[] = [
     name: 'Fanas Poli',
     weight: '1 packet (Approx 200gm)',
     mrp: 90,
-    ratePerKg: 450,
     description: 'Dark brown, sticky, highly distinct sweet jackfruit leather cooked intensely and thin-spread over traditional straw frames.',
     ingredients: 'Golden Ripe Jackfruit pulp, Pure Jaggery traces',
     usage: 'Ready to devour. Features an exotic warm aroma and delightful deep organic chewiness.',
@@ -620,7 +606,6 @@ const DEFAULT_PRODUCTS: Product[] = [
     name: 'Malvani Khaja',
     weight: '1 packet (Approx 200gm)',
     mrp: 40,
-    ratePerKg: 200,
     description: 'Crispy, ribbon-like finger-length sweet flour crisps fried till light and coated with warm dissolved ginger-jaggery syrup.',
     ingredients: 'Refined Wheat Flour, Ghee, Jaggery, Fresh Ginger extract, Sesame seeds',
     usage: 'Eat straight out of the box. Traditional local fair (Jatra) sweet of Malvan.',
@@ -636,7 +621,6 @@ const DEFAULT_PRODUCTS: Product[] = [
     name: 'Khadkhade Laddoos',
     weight: '25 unit box',
     mrp: 80,
-    ratePerKg: 80,
     description: 'Unique, hollow and incredibly crispy sweet balls rolled traditionally using dried rice flour flakes and molten hot jaggery.',
     ingredients: 'Fine Rice flakes, Molten Jaggery, Cow Ghee, Cardamom seeds',
     usage: 'Ready to enjoy. Features a highly unique hollow crisp snap when bitten!',
@@ -650,7 +634,6 @@ const DEFAULT_PRODUCTS: Product[] = [
     name: 'Kadak Bundi Laddoo',
     weight: '25 unit box',
     mrp: 80,
-    ratePerKg: 80,
     description: 'Crunchy, dense sugar-glazed golden chickpea flour drops mixed with warm cardamom and pressed tightly into classic sphere formats.',
     ingredients: 'Bengal Gram flour (Besan), Sugar crystals, Pure Cow Ghee, Nutmeg, Cardamom',
     usage: 'Ready to eat festive sweet treats.',
@@ -664,7 +647,6 @@ const DEFAULT_PRODUCTS: Product[] = [
     name: 'Shev Laddoo',
     weight: '25 unit box',
     mrp: 80,
-    ratePerKg: 80,
     description: 'Inimitable local salty-sweet combination laddoos made with fine chickpea flour noodles glazed in thick cardamom-infused jaggery syrup.',
     ingredients: 'Bengal Gram flour noodles, Sugarcane Jaggery, Ghee, Sesame seeds',
     usage: 'Ready to eat. Melts easily with a satisfying moist crumbly texture.',
@@ -678,7 +660,6 @@ const DEFAULT_PRODUCTS: Product[] = [
     name: 'Shengdana Laddoo',
     weight: '20 unit box',
     mrp: 90,
-    ratePerKg: 90,
     description: 'Extremely nutritious, protein-concentrated balls of coarse crushed sweet peanuts bound with pure melted organic jaggery.',
     ingredients: 'Selected Roasted Peanuts, Molten sugarcane Jaggery, Ghee highlights',
     usage: 'Perfect healthy breakfast bite or immediate non-chemical energy boost post gym/school.',
@@ -694,15 +675,12 @@ const DEFAULT_PRODUCTS: Product[] = [
     name: 'Polish Kaju (Big Size)',
     weight: '250gm',
     mrp: 380,
-    ratePerKg: 1520,
     description: 'Sovereign white premium jumbo cashews carefully hand-sorted to exclude any blemishes. Pristine ivory shine.',
     ingredients: 'Export-grade whole Raw Cashew Nuts (Kaju)',
     usage: 'Consume raw as premium snacks, gift in dynamic occasions, or chop into luxury desserts and rich royal gravies.',
     shelfLife: '9 Months',
     notes: 'Grown on Malvan family plantations, carefully polished without heat.',
-    image: '/src/assets/images/Kaju/polish kaju (big size).webP',
-    stock: 0,
-    isBestseller: false
+    image: '/src/assets/images/Kaju/polish kaju (big size).webP'
   },
   {
     id: 'k2',
@@ -716,9 +694,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     usage: 'Ready-to-eat gourmet snack. Incredible tea-time luxury.',
     shelfLife: '9 Months',
     notes: 'Roasted at low temperature to protect healthy fats.',
-    image: '/src/assets/images/Kaju/Salwale kaju (big size).webP',
-    stock: 0,
-    isBestseller: false
+    image: '/src/assets/images/Kaju/Salwale kaju (big size).webP'
   },
   {
     id: 'k3',
@@ -732,9 +708,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     usage: 'Ready-to-eat luxury snacks for hosting guests or office munching.',
     shelfLife: '9 Months',
     notes: 'Highly cost-effective family snack pack size.',
-    image: '/src/assets/images/Kaju/Salwale kaju (medium size).webP',
-    stock: 0,
-    isBestseller: false
+    image: '/src/assets/images/Kaju/Salwale kaju (medium size).webP'
   },
   {
     id: 'k4',
@@ -748,9 +722,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     usage: 'Eat straight out of the jar. Pairs well with juices, snacks, and sweet platters.',
     shelfLife: '9 Months',
     notes: 'Protected with gas-flush packaging to avoid oxygen-staling.',
-    image: '/src/assets/images/Kaju/Salted kaju.webP',
-    stock: 0,
-    isBestseller: false
+    image: '/src/assets/images/Kaju/Salted kaju.webP'
   },
   {
     id: 'k5',
@@ -764,9 +736,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     usage: 'Stellar premium savory snack for high-end hospitality.',
     shelfLife: '9 Months',
     notes: 'A perfect explosion of Konkan flavors in every single kernel.',
-    image: '/src/assets/images/Kaju/Masala kaju.webP',
-    stock: 0,
-    isBestseller: false
+    image: '/src/assets/images/Kaju/Masala kaju.webP'
   },
   {
     id: 'k6',
@@ -780,9 +750,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     usage: 'Incorporate in rice puddings (kheer), cake batters, festive sweets, or blend for rich Mughlai cashew paste bases.',
     shelfLife: '9 Months',
     notes: 'Highly economical kitchen utility ingredient.',
-    image: '/src/assets/images/Kaju/Tukda kaju.webP',
-    stock: 0,
-    isBestseller: false
+    image: '/src/assets/images/Kaju/Tukda kaju.webP'
   },
   {
     id: 'k7',
@@ -796,9 +764,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     usage: 'Excellent dry snack, useful for school-going kids, or as dry fruit decor plates.',
     shelfLife: '9 Months',
     notes: 'Pure raw cashews, entirely unroasted.',
-    image: '/src/assets/images/Kaju/polish kaju (medium size).webP',
-    stock: 0,
-    isBestseller: false
+    image: '/src/assets/images/Kaju/polish kaju (medium size).webP'
   }
 ];
 

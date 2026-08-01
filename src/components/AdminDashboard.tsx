@@ -333,10 +333,18 @@
                 getDocs(collection(db, 'categories'))
               ]);
               setProducts(prodSnap.docs.map(d => ({ id: d.id, ...d.data() })));
-              setCategories(catSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+              setCategories(catSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => {
+                const indexA = CATEGORIES.findIndex((c: any) => c.id === a.id);
+                const indexB = CATEGORIES.findIndex((c: any) => c.id === b.id);
+                return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+              }));
             } else if (activeTab === 'categories') {
               const catSnap = await getDocs(collection(db, 'categories'));
-              setCategories(catSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+              setCategories(catSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => {
+                const indexA = CATEGORIES.findIndex((c: any) => c.id === a.id);
+                const indexB = CATEGORIES.findIndex((c: any) => c.id === b.id);
+                return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+              }));
             } else if (activeTab === 'recipes') {
               const recSnap = await getDocs(collection(db, 'recipes'));
               const fbRecipes = recSnap.docs.map(d => ({ id: d.id, ...d.data() })) as any[];
@@ -4597,4 +4605,3 @@ Step 2..."
       </div>
     );
   }
-  
