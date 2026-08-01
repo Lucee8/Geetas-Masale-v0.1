@@ -59,7 +59,7 @@ export default function PaymentSettings() {
       await setDoc(doc(db, 'settings', 'payment_settings'), settings, { merge: true });
       showToast('Payment settings saved successfully!', 'success');
         } else {
-        const token = localStorage.getItem('gm_admin_token') || '';
+        const token = localStorage.getItem('admin_token') || '';
         const res = await fetch('/api/admin/settings/payment', {
           method: 'POST',
           headers: {
@@ -131,6 +131,8 @@ export default function PaymentSettings() {
   if (loading) return <div className="p-8 text-center"><RefreshCw className="w-6 h-6 animate-spin mx-auto text-slate-400" /></div>;
 
   const previewAmount = settings.amountBehavior === 'fixed' && settings.fixedAmount ? settings.fixedAmount : '1,250.00';
+  const upiString = `upi://pay?pa=${settings.upiId || 'username@bank'}&pn=${encodeURIComponent(settings.merchantName || 'Merchant Name')}&am=${previewAmount.replace(/,/g, '')}&cu=INR&tn=${encodeURIComponent(settings.paymentNote || 'Order Payment')}`;
+  const liveQrUrl = settings.qrImage || (settings.upiId ? `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiString)}&color=0f172a&bgcolor=FFFFFF` : '');
 
   return (
     <div className="w-full">
@@ -307,9 +309,9 @@ export default function PaymentSettings() {
               
               <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 flex flex-col items-center justify-center text-center">
                 <div className="w-48 h-48 bg-white p-2 rounded-2xl shadow-sm border border-slate-100 mb-4 overflow-hidden relative">
-                  {settings.qrImage ? (
-                    <img src={settings.qrImage} alt="QR Code" className="w-full h-full object-cover" />
-                  ) : (
+                  {liveQrUrl ? (
+                    <img src={liveQrUrl} alt="QR Code" className="w-full h-full object-cover" />
+) : (
                     <div className="w-full h-full flex items-center justify-center bg-slate-50 text-slate-300">
                       <QrCode className="w-16 h-16 opacity-50" />
                     </div>
