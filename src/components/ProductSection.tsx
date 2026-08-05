@@ -208,7 +208,7 @@ Please confirm availability and sharing banking details for packing. Thanks!`;
                       onClick={() => handleOpenModal(p)}
                       className="w-full h-full object-contain group-hover:scale-105 duration-700 ease-out cursor-pointer"
                       referrerPolicy="no-referrer"
-                    />
+                    />  
 
                     {/* Left category tab label */}
                     <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-[#A61B1B] text-white text-[8px] sm:text-[10px] font-mono tracking-wider sm:tracking-widest px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full uppercase border border-white/20 backdrop-blur-sm shadow-sm select-none">

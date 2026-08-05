@@ -1296,7 +1296,6 @@ export default function InquiryDrawer({
                   </div>
                 )}
               </div>
-
             </motion.div>
           </div>
         </div>

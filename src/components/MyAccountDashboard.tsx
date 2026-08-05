@@ -41,11 +41,13 @@ interface MyAccountDashboardProps {
   onClose: () => void;
   onOpenCart: () => void;
   onAddToCart: (product: Product, quantity: number) => void;
+  productsList?: Product[];
+
 }
 
 type TabType = 'dashboard' | 'orders' | 'wishlist' | 'addresses' | 'profile' | 'reviews' | 'settings';
 
-export default function MyAccountDashboard({ onClose, onOpenCart, onAddToCart }: MyAccountDashboardProps) {
+export default function MyAccountDashboard({ onClose, onOpenCart, onAddToCart, productsList = [] }: MyAccountDashboardProps) {
   const { 
     profile, 
     orders, 
@@ -263,7 +265,7 @@ export default function MyAccountDashboard({ onClose, onOpenCart, onAddToCart }:
 
   // Find product helper
   const getProductById = (id: string): Product | undefined => {
-    return PRODUCTS.find(p => p.id === id);
+    return productsList.find(p => p.id === id) || PRODUCTS.find(p => p.id === id);
   };
 
   return (

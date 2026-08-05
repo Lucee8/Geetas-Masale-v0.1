@@ -328,6 +328,7 @@ export default function App() {
   if (myAccountOpen) {
     return (
       <MyAccountDashboard 
+        productsList={productsList}
         onClose={() => setMyAccountOpen(false)}
         onOpenCart={() => {
           setMyAccountOpen(false);
