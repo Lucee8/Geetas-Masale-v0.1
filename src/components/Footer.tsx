@@ -205,14 +205,14 @@ export default function Footer({ onNavigate, onOpenAdmin }: FooterProps) {
             <p>© 2026 GEETA'S MASALE. AUTHENTIC MALVANI TASTE, CRAFTED WITH TRADITION.</p>
             <p className="text-[9px] text-slate-500 normal-case">
               Directly Sourced inside Kasal-Malvan Rd, Maharashtra 416606
-              {onOpenAdmin && (
+              {/* {onOpenAdmin && (
                 <>
                   {' • '}
                   <button onClick={onOpenAdmin} className="text-[#A61B1B] font-bold hover:underline cursor-pointer">
                     🔑 Manage Store (Admin)
                   </button>
                 </>
-              )}
+              )} */}
             </p>
           </div>
 
