@@ -446,7 +446,7 @@
         } else if (activeTab === 'recipes') {
           const data = await safeFetchJson('/api/admin/recipes', { headers }).catch(() => []);
           const mergedAPI = [...RECIPES];
-          (data || []).forEach(r => {
+          (data || []).forEach((r: any) => {
             if (!mergedAPI.find(mr => mr.id === r.id)) {
               mergedAPI.push(r);
             } else {
@@ -3518,12 +3518,17 @@ const handleCategorySubmit = async (e: React.FormEvent) => {
                         onChange={e => setProductForm(prev => ({ ...prev, weight: e.target.value }))}
                         className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-sans text-slate-700 bg-white"
                       >
-                        <option value="100gm">100gm</option>
-                        <option value="200gm">200gm</option>
-                        <option value="250gm">250gm</option>
-                        <option value="300gm">300gm</option>
-                        <option value="500gm">500gm</option>
-                        <option value="1kg">1kg</option>
+                        <option value="50 gm">50 gm</option>
+                        <option value="100gm">100 gm</option>
+                        <option value="180 gm">180 gm</option>
+                        <option value="200gm">200 gm</option>
+                        <option value="250gm">250 gm</option>
+                        <option value="300gm">300 gm</option>
+                        <option value="400 gm">400 gm</option>
+                        <option value="500gm">500 gm</option>
+                        <option value="1kg">1 kg</option>
+                        <option value="500 ml">500 ml</option>
+                        <option value="1000 ml">1000 ml</option>
                       </select>
                     </div>
 
@@ -4088,7 +4093,7 @@ Step 2..."
                               const next = prompt('Modify Tracking ID:', selectedOrderDetails.trackingNumber);
                               if (next !== null) {
                                 handleOrderAddTracking(selectedOrderDetails.id, next);
-                                setSelectedOrderDetails(prev => ({ ...prev, trackingNumber: next }));
+                                setSelectedOrderDetails((prev: any) => ({ ...prev, trackingNumber: next }));
                               }
                             }}
                             className="text-[#A61B1B] hover:underline font-bold cursor-pointer"
@@ -4102,7 +4107,7 @@ Step 2..."
                             const val = prompt('Enter Courier tracking registration ID (e.g., Delhivery / DTDC):');
                             if (val) {
                               handleOrderAddTracking(selectedOrderDetails.id, val);
-                              setSelectedOrderDetails(prev => ({ ...prev, trackingNumber: val }));
+                              setSelectedOrderDetails((prev: any) => ({ ...prev, trackingNumber: val }));
                             }
                           }}
                           className="py-1 px-2.5 border border-[#A61B1B]/15 text-[#A61B1B] hover:bg-[#A61B1B] hover:text-white rounded text-[10px] font-mono font-black uppercase transition-all inline-block cursor-pointer"
@@ -4367,7 +4372,7 @@ Step 2..."
                       else nextStatus = 'Delivered';
 
                       handleOrderStatusUpdate(selectedOrderForDrawer.id, nextStatus);
-                      setSelectedOrderForDrawer(prev => ({ ...prev, status: nextStatus }));
+                      setSelectedOrderForDrawer((prev: any) => ({ ...prev, status: nextStatus }));
                     }}
                     className="flex-1 py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-sans font-bold flex items-center justify-center space-x-1.5 transition-all cursor-pointer active:scale-98"
                   >
