@@ -43,10 +43,18 @@ export default function Hero({ onExploreClick, onWhatsAppClick, onSelectCategory
       id="hero"
       className="relative w-full overflow-hidden bg-[#FAF9F6] pt-24 sm:pt-32 pb-16 snap-start scroll-mt-20 border-b border-slate-100"
     >
-      {/* Subtle background color gradients for elegant depth */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-12 left-1/4 w-[350px] h-[350px] rounded-full bg-[#A61B1B]/4 blur-[130px]" />
-        <div className="absolute bottom-20 right-1/4 w-[400px] h-[400px] rounded-full bg-[#D21F1F]/3 blur-[140px]" />
+      {/* Hero Background Image */}
+      <div 
+        className="absolute inset-0 z-0 pointer-events-none"
+        style={{
+          backgroundImage: `url('https://kommodo.ai/i/IMJye6e5bnxmlg7ByMK1')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      >
+        {/* Light premium overlay for text readability */}
+        <div className="absolute inset-0 bg-[#FAF9F6]/85 sm:bg-[#FAF9F6]/80" />
       </div>
 
       <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
