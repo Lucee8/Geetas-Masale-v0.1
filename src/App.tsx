@@ -139,7 +139,7 @@ export default function App() {
           });
           const finalCats = categories.length > 0 ? categories : CATEGORIES;
           setCategoriesList(finalCats);
-          sessionStorage.setItem('gm_categories', JSON.stringify(finalCats));
+          try { sessionStorage.setItem('gm_categories', JSON.stringify(finalCats)); } catch(e) {}
         } catch (err) {
 
           console.error("Categories fetch err:", err);
@@ -155,7 +155,7 @@ export default function App() {
           const products = prodSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Product[];
           const finalProds = products.length > 0 ? products : PRODUCTS;
           setProductsList(finalProds);
-          sessionStorage.setItem('gm_products', JSON.stringify(finalProds));
+          try { sessionStorage.setItem('gm_products', JSON.stringify(finalProds)); } catch(e) {}
         } catch (err) {
           console.error("Products fetch err:", err);
           setProductsList(PRODUCTS);
