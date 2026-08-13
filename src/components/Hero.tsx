@@ -13,9 +13,10 @@ interface HeroProps {
   onWhatsAppClick: () => void;
   onSelectCategory: (categoryId: string) => void;
   categoriesList?: any[];
+  isLoading?: boolean;
 }
 
-export default function Hero({ onExploreClick, onWhatsAppClick, onSelectCategory, categoriesList = [] }: HeroProps) {
+export default function Hero({ onExploreClick, onWhatsAppClick, onSelectCategory, categoriesList = [], isLoading = false }: HeroProps) {
   // Stagger wrapper settings for clean visual entrance
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -88,7 +89,23 @@ export default function Hero({ onExploreClick, onWhatsAppClick, onSelectCategory
           </div>
 
           {/* Minimal 2-Column Mobile & 5-Column Desktop Grid */}
+          
+          {isLoading ? (
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-6 pt-2">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="h-56 sm:h-80 rounded-2xl bg-slate-100 animate-pulse border border-slate-200/60 p-3 sm:p-5 flex flex-col justify-end shadow-sm">
+                  <div className="space-y-2.5 w-full">
+                    <div className="h-3 w-16 bg-slate-200 rounded-full"></div>
+                    <div className="h-5 w-3/4 bg-slate-200 rounded-md"></div>
+                    <div className="h-3 w-full bg-slate-200 rounded-sm"></div>
+                    <div className="h-3 w-5/6 bg-slate-200 rounded-sm"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-6 pt-2">
+
             {categoriesList.map((cat, idx) => (
               <motion.div
                 key={cat.id}
@@ -110,6 +127,7 @@ export default function Hero({ onExploreClick, onWhatsAppClick, onSelectCategory
                     alt={cat.name}
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                     referrerPolicy="no-referrer"
+                    loading="lazy"
                   />
                   {/* Dark premium gradient overlay mask */}
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/50 to-transparent opacity-90 transition-opacity group-hover:opacity-95" />
@@ -144,9 +162,8 @@ export default function Hero({ onExploreClick, onWhatsAppClick, onSelectCategory
               </motion.div>
             ))}
           </div>
-
+          )}
         </div>
-
       </div>
 
     </section>

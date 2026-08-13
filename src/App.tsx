@@ -97,125 +97,101 @@ export default function App() {
     fetchStoreData(); // Refresh data so website reflects admin changes
   };
 
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
+  const [isProductsLoading, setIsProductsLoading] = useState(true);
+
   const fetchStoreData = async () => {
     try {
-      if (isFirebaseConfigured && db) {
-        try {
-          // Auto seed if database collections are empty
-          await seedDatabaseIfEmpty();
+      if (isVercel || (!isFirebaseConfigured || !db)) {
+        setProductsList(PRODUCTS);
+        setCategoriesList(CATEGORIES);
+        setRecipesList(RECIPES);
+        setIsCategoriesLoading(false);
+        setIsProductsLoading(false);
+        setLoading(false);
+        return;
+      }
 
-          // Fetch from Firestore
-          const prodSnap = await getDocs(collection(db, 'products'));
+      // Check cache first
+      try {
+        const cachedCats = sessionStorage.getItem('gm_categories');
+        if (cachedCats) {
+          setCategoriesList(JSON.parse(cachedCats));
+          setIsCategoriesLoading(false);
+        }
+        
+        const cachedProds = sessionStorage.getItem('gm_products');
+        if (cachedProds) {
+          setProductsList(JSON.parse(cachedProds));
+          setIsProductsLoading(false);
+        }
+      } catch(e) {}
+
+      // Fire independent promises
+      const fetchCategories = async () => {
+        try {
           const catSnap = await getDocs(collection(db, 'categories'));
 
-          const products = prodSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Product[];
           const categories = catSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => {
             const indexA = CATEGORIES.findIndex(c => c.id === a.id);
             const indexB = CATEGORIES.findIndex(c => c.id === b.id);
             return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
           });
+          const finalCats = categories.length > 0 ? categories : CATEGORIES;
+          setCategoriesList(finalCats);
+          sessionStorage.setItem('gm_categories', JSON.stringify(finalCats));
+        } catch (err) {
+
+          console.error("Categories fetch err:", err);
+          setCategoriesList(CATEGORIES);
+        } finally {
+          setIsCategoriesLoading(false);
+        }
+      };
+
+      const fetchProducts = async () => {
+        try {
+          const prodSnap = await getDocs(collection(db, 'products'));
+          const products = prodSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Product[];
+          const finalProds = products.length > 0 ? products : PRODUCTS;
+          setProductsList(finalProds);
+          sessionStorage.setItem('gm_products', JSON.stringify(finalProds));
+        } catch (err) {
+          console.error("Products fetch err:", err);
+          setProductsList(PRODUCTS);
+        } finally {
+          setIsProductsLoading(false);
+        }
+      };
+
+      const fetchRecipes = async () => {
+        try {
           const recSnap = await getDocs(collection(db, 'recipes'));
           const recipes = recSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Recipe[];
-          
-          if (recipes.length > 0 || recSnap.docs.length === 0) {
-            // Because recipes are seeded, Firebase is the source of truth. No need to merge.
-            // If they deleted all recipes, it will be 0 length and we respect that.
-            setRecipesList(recipes);
-          } else {
-            setRecipesList(RECIPES);
-          }
-          
-
-          if (products.length > 0) {
-            setProductsList(products);
-          } else {
-            setProductsList(PRODUCTS);
-          }
-
-          if (categories.length > 0) {
-            setCategoriesList(categories);
-          } else {
-            setCategoriesList(CATEGORIES);
-          }
-
-          setLoading(false);
-          return;
-        } catch (firebaseErr) {
-          console.error("Firebase fetch failed, falling back to local/API:", firebaseErr);
-        }
-      }
-
-      if (isVercel) {
-        setProductsList(PRODUCTS);
-        setCategoriesList(CATEGORIES);
-        setRecipesList(RECIPES);
-        setLoading(false);
-        return;
-      }
-
-      const [prodRes, catRes, recRes] = await Promise.all([
-        fetch('/api/products').catch(() => null),
-        fetch('/api/categories').catch(() => null),
-        fetch('/api/recipes').catch(() => null)
-      ]);
-      
-      let gotProducts = false;
-      let gotCategories = false;
-
-      if (prodRes && prodRes.ok) {
-        try {
-          const prodData = await prodRes.json();
-          if (Array.isArray(prodData) && prodData.length > 0) {
-            setProductsList(prodData);
-            gotProducts = true;
-          }
+          setRecipesList(recipes.length > 0 || recSnap.docs.length === 0 ? recipes : RECIPES);
         } catch (err) {
-          console.error("Error parsing products from API:", err);
-        }
-      }
-
-      if (catRes && catRes.ok) {
-        try {
-          const catData = await catRes.json();
-          if (Array.isArray(catData) && catData.length > 0) {
-            setCategoriesList(catData);
-            gotCategories = true;
-          }
-        } catch (err) {
-          console.error("Error parsing categories from API:", err);
-        }
-      }
-
-      // If API calls failed or returned empty (e.g. on Vercel), fall back to clean local storeData
-      if (!gotProducts) {
-        setProductsList(PRODUCTS);
-      }
-      if (!gotCategories) {
-        setCategoriesList(CATEGORIES);
-      }
-      
-      if (recRes && recRes.ok) {
-        try {
-          const recData = await recRes.json();
-          if (Array.isArray(recData)) {
-            setRecipesList(recData);
-          } else {
-            setRecipesList(RECIPES);
-          }
-        } catch (err) {
+          console.error("Recipes fetch err:", err);
           setRecipesList(RECIPES);
         }
-      } else {
-        setRecipesList(RECIPES);
-      }
+      };
 
+      // Seed if empty asynchronously without blocking everything if possible
+      await seedDatabaseIfEmpty();
+
+      // Run fetches concurrently
+      fetchCategories();
+      fetchProducts();
+      fetchRecipes();
       
-    } catch (e) {
-      console.error("Failed to load products/categories from express DB APIs, falling back to local:", e);
+      setLoading(false);
+
+    } catch (error) {
+      console.error('Failed to fetch store data:', error);
       setProductsList(PRODUCTS);
       setCategoriesList(CATEGORIES);
       setRecipesList(RECIPES);
-    } finally {
+      setIsCategoriesLoading(false);
+      setIsProductsLoading(false);
       setLoading(false);
     }
   };
@@ -367,6 +343,7 @@ export default function App() {
         onWhatsAppClick={handleWhatsAppGeneralClick}
         onSelectCategory={handleCategorySelection}
         categoriesList={categoriesList}
+        isLoading={isCategoriesLoading}
       />
 
       <ProductSection
@@ -378,6 +355,7 @@ export default function App() {
         inquiryList={inquiryBag}
         productsList={productsList}
         categoriesList={categoriesList}
+        isLoading={isProductsLoading}
       />
 
       <Heritage />

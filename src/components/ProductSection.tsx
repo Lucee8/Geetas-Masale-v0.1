@@ -18,6 +18,7 @@ interface ProductSectionProps {
   inquiryList: { product: Product; quantity: number }[];
   productsList?: Product[];
   categoriesList?: any[];
+  isLoading?: boolean;
 }
 
 export default function ProductSection({
@@ -29,10 +30,12 @@ export default function ProductSection({
   inquiryList,
   productsList,
   categoriesList,
+  isLoading = false,
 }: ProductSectionProps) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [modalQuantity, setModalQuantity] = useState(1);
   const [sortBy, setSortBy] = useState<'mrp-asc' | 'mrp-desc' | 'name' | 'default'>('default');
+  const [visibleCount, setVisibleCount] = useState(12);
 
   // Categories list
   const filterTabs = categoriesList && categoriesList.length > 0
@@ -50,6 +53,11 @@ export default function ProductSection({
       ];
 
   // Process sorting & filtering
+  // Reset visible count when filters change
+  React.useEffect(() => {
+    setVisibleCount(12);
+  }, [selectedCategory, searchQuery, sortBy]);
+
   const filteredProducts = useMemo(() => {
     let result = productsList && productsList.length > 0 ? [...productsList] : [...PRODUCTS];
 
@@ -187,7 +195,7 @@ Please confirm availability and sharing banking details for packing. Thanks!`;
         {/* Main Grid display products */}
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
           <AnimatePresence mode="popLayout">
-            {filteredProducts.map((p) => {
+            {filteredProducts.slice(0, visibleCount).map((p) => {
               const inBagCount = inquiryList.find((item) => item.product.id === p.id)?.quantity || 0;
 
               return (
@@ -207,7 +215,7 @@ Please confirm availability and sharing banking details for packing. Thanks!`;
                       alt={p.name}
                       onClick={() => handleOpenModal(p)}
                       className="w-full h-full object-contain group-hover:scale-105 duration-700 ease-out cursor-pointer"
-                      referrerPolicy="no-referrer"
+                      referrerPolicy="no-referrer" loading="lazy"
                     />  
 
                     {/* Left category tab label */}
@@ -293,7 +301,16 @@ Please confirm availability and sharing banking details for packing. Thanks!`;
             })}
           </AnimatePresence>
         </div>
-
+        {filteredProducts.length > visibleCount && (
+          <div className="flex justify-center mt-12">
+            <button
+              onClick={() => setVisibleCount(prev => prev + 12)}
+              className="px-8 py-3 rounded-xl border-2 border-[#A61B1B] text-[#A61B1B] hover:bg-[#A61B1B] hover:text-white font-sans font-bold text-xs tracking-widest uppercase transition-colors cursor-pointer"
+            >
+              Load More Products
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Product Information Details Overlay Modal Drawer */}
@@ -321,7 +338,7 @@ Please confirm availability and sharing banking details for packing. Thanks!`;
                   src={resolveProductImage(selectedProduct)}
                   alt={selectedProduct.name}
                   className="w-full h-full max-h-[120px] sm:max-h-[180px] md:max-h-[380px] object-contain drop-shadow-md rounded-lg"
-                  referrerPolicy="no-referrer"
+                  referrerPolicy="no-referrer" loading="lazy"
                 />
                 
                 {/* Visual highlights */}
