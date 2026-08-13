@@ -64,7 +64,7 @@ export default function Hero({ onExploreClick, onWhatsAppClick, onSelectCategory
           >
             <div className="absolute inset-0 bg-slate-900/10 pointer-events-none z-10" />
             <img 
-              src="https://kommodo.ai/i/TzCmRFBWm59xphyUGbkf" 
+              src="https://plain-apac-prod-public.komododecks.com/202608/13/TzCmRFBWm59xphyUGbkf/image.png" 
               alt="Authentic Malvani Spices" 
               className="w-full h-[50vh] sm:h-[60vh] md:h-[70vh] object-cover hover:scale-105 transition-transform duration-1000 ease-out"
               referrerPolicy="no-referrer"
