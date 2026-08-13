@@ -127,7 +127,7 @@ export default function Hero({ onExploreClick, onWhatsAppClick, onSelectCategory
                 {/* Backdrop image */}
                 <div className="absolute inset-0 z-0">
                   <img
-                    src={resolveCategoryImage(cat) || 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&auto=format&fm=webp&fit=crop&q=80'}
+                    src={resolveCategoryImage(cat) || 'https://plain-apac-prod-public.komododecks.com/202608/13/TzCmRFBWm59xphyUGbkf/image.png'}
                     alt={cat.name}
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                     referrerPolicy="no-referrer"
