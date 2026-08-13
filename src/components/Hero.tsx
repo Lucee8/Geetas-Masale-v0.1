@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { motion, type Variants } from 'motion/react';
+import { motion } from 'motion/react';
 import { MoveRight } from 'lucide-react';
 import { resolveCategoryImage } from '../data/storeData';
 
@@ -29,7 +29,8 @@ export default function Hero({ onExploreClick, onWhatsAppClick, onSelectCategory
     },
   };
 
-  const itemVariants: Variants = {
+  // typed as any to satisfy motion/react Variants typing differences
+  const itemVariants: any = {
     hidden: { opacity: 0, y: 20 },
     visible: { 
       opacity: 1, 
@@ -41,49 +42,44 @@ export default function Hero({ onExploreClick, onWhatsAppClick, onSelectCategory
   return (
     <section
       id="hero"
-      className="relative w-full overflow-hidden bg-[#FAF9F6] pt-24 sm:pt-32 pb-16 snap-start scroll-mt-20 border-b border-slate-100"
+      className="relative w-full overflow-hidden bg-[#FAF9F6] pt-16 sm:pt-20 pb-16 snap-start scroll-mt-20 border-b border-slate-100"
     >
-      {/* Hero Background Image */}
-      <div 
-        className="absolute inset-0 z-0 pointer-events-none"
-        style={{
-          backgroundImage: `url('https://kommodo.ai/i/IMJye6e5bnxmlg7ByMK1')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        }}
-      >
-        {/* Light premium overlay for text readability */}
-        <div className="absolute inset-0 bg-[#FAF9F6]/85 sm:bg-[#FAF9F6]/80" />
+      {/* Subtle background color gradients for elegant depth */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-12 left-1/4 w-[350px] h-[350px] rounded-full bg-[#A61B1B]/4 blur-[130px]" />
+        <div className="absolute bottom-20 right-1/4 w-[400px] h-[400px] rounded-full bg-[#D21F1F]/3 blur-[140px]" />
+      </div>
+
+      {/* Edge-to-Edge Hero Image */}
+      <div className="relative z-20 w-full mb-10 sm:mb-16">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="w-full"
+        >
+          <motion.div 
+            variants={itemVariants} 
+            className="relative w-full overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-slate-900/10 pointer-events-none z-10" />
+            <img 
+              src="https://kommodo.ai/i/TzCmRFBWm59xphyUGbkf" 
+              alt="Authentic Malvani Spices" 
+              className="w-full h-[50vh] sm:h-[60vh] md:h-[70vh] object-cover hover:scale-105 transition-transform duration-1000 ease-out"
+              referrerPolicy="no-referrer"
+              loading="eager"
+            />
+          </motion.div>
+        </motion.div>
       </div>
 
       <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Intro Block: Brand Statement & Typography */}
-        <div className="flex flex-col items-center text-center py-6 sm:py-8">
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="space-y-4 sm:space-y-6 max-w-4xl"
-          >
-            {/* Title / Hero Headline */}
-            <div className="space-y-3 sm:space-y-4">
-              <motion.h1 
-                variants={itemVariants}
-                className="font-sans text-3xl sm:text-5xl md:text-[54px] font-black tracking-tight text-[#0F172A] leading-[1.1] uppercase"
-              >
-                HANDMADE AUTHENTIC <br className="hidden sm:inline" />
-                <span className="text-[#A61B1B]">MALVANI MASALAS</span> & <span className="text-slate-500">PURE KONKANI MEVA</span>
-              </motion.h1>
-            </div>
-          </motion.div>
-        </div>
-
         {/* ------------------------------------------------------------------------- */}
         {/* Departments & Custom Store Category Section */}
         {/* ------------------------------------------------------------------------- */}
-        <div id="categories" className="mt-8 sm:mt-12 space-y-6 sm:space-y-8 scroll-mt-20">
+        <div id="categories" className="space-y-6 sm:space-y-8 scroll-mt-20">
           
           {/* Categories Title block */}
           <div className="text-center max-w-3xl mx-auto space-y-2">
@@ -112,7 +108,7 @@ export default function Hero({ onExploreClick, onWhatsAppClick, onSelectCategory
               ))}
             </div>
           ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-6 pt-2">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-6 pt-2">
 
             {categoriesList.map((cat, idx) => (
               <motion.div
@@ -131,7 +127,7 @@ export default function Hero({ onExploreClick, onWhatsAppClick, onSelectCategory
                 {/* Backdrop image */}
                 <div className="absolute inset-0 z-0">
                   <img
-                    src={resolveCategoryImage(cat) || 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&auto=format&fit=crop&q=80'}
+                    src={resolveCategoryImage(cat) || 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&auto=format&fm=webp&fit=crop&q=80'}
                     alt={cat.name}
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                     referrerPolicy="no-referrer"
@@ -172,6 +168,7 @@ export default function Hero({ onExploreClick, onWhatsAppClick, onSelectCategory
           </div>
           )}
         </div>
+
       </div>
 
     </section>
