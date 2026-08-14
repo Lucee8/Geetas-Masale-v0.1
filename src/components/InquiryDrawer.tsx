@@ -262,7 +262,23 @@ export default function InquiryDrawer({
 
   // Pricing calculations
   const totalPricing = inquiryList.reduce((acc, item) => acc + item.product.mrp * item.quantity, 0);
-  const deliveryFee = totalPricing > 499 ? 0 : 40;
+
+  const totalWeightInKg = inquiryList.reduce((acc, item) => {
+    const weightStr = item.product.weight || '0';
+    let numericVal = parseFloat(weightStr);
+    if (isNaN(numericVal)) numericVal = 0;
+    
+    let itemWeightKg = 0;
+    if (weightStr.toLowerCase().includes('kg')) {
+      itemWeightKg = numericVal;
+    } else {
+      // assume gm or ml
+      itemWeightKg = numericVal / 1000;
+    }
+    return acc + (itemWeightKg * item.quantity);
+  }, 0);
+
+  const deliveryFee = Math.round(totalWeightInKg * 140);
 
   // Coupon standard offer application
   const discountPct = appliedCoupon ? Number(appliedCoupon.discount) / 100 : 0;
@@ -440,8 +456,24 @@ export default function InquiryDrawer({
     const savedTotalPricing = confirmedOrder 
       ? confirmedOrder.items.reduce((acc: number, item: any) => acc + item.price * item.quantity, 0) 
       : totalPricing;
-    const savedDeliveryFee = savedTotalPricing > 499 ? 0 : 40;
-    const savedDiscountAmount = confirmedOrder 
+    
+    const savedTotalWeightInKg = confirmedOrder
+      ? confirmedOrder.items.reduce((acc: number, item: any) => {
+          const weightStr = item.weight || '0';
+          let numericVal = parseFloat(weightStr);
+          if (isNaN(numericVal)) numericVal = 0;
+          let itemWeightKg = 0;
+          if (weightStr.toLowerCase().includes('kg')) {
+            itemWeightKg = numericVal;
+          } else {
+            itemWeightKg = numericVal / 1000;
+          }
+          return acc + (itemWeightKg * item.quantity);
+        }, 0)
+      : totalWeightInKg;
+
+      const savedDeliveryFee = Math.round(savedTotalWeightInKg * 140);
+      const savedDiscountAmount = confirmedOrder 
       ? Math.max(0, savedTotalPricing + savedDeliveryFee - confirmedOrder.total) 
       : discountAmount;
 
