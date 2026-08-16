@@ -273,7 +273,7 @@ export default function App() {
     });
     
     // Auto-open drawer when adding for premium visual feedback
-    setInquiryDrawerOpen(true);
+    // setInquiryDrawerOpen(true);
   };
 
   const handleRemoveInquiryItem = (productId: string) => {
