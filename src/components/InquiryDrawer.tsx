@@ -763,7 +763,7 @@ export default function InquiryDrawer({
                             type="text"
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
-                            placeholder="e.g. Bhavesh K"
+                            placeholder="Enter full name"
                             className="w-full pl-9 pr-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-sans text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#A61B1B] focus:border-[#A61B1B]"
                           />
                         </div>
@@ -810,7 +810,7 @@ export default function InquiryDrawer({
                           type="text"
                           value={streetAddress}
                           onChange={(e) => setStreetAddress(e.target.value)}
-                          placeholder="e.g. House no.5 Chaitanya Beach Resort, Devbag"
+                          placeholder="Enter house or building details"
                           className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-sans text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#A61B1B] focus:border-[#A61B1B]"
                         />
                       </div>
@@ -824,7 +824,7 @@ export default function InquiryDrawer({
                           type="text"
                           value={landmark}
                           onChange={(e) => setLandmark(e.target.value)}
-                          placeholder="e.g. Near Tarkarli Beach Jetty"
+                          placeholder="Enter landmark (optional)"
                           className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-sans text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#A61B1B] focus:border-[#A61B1B]"
                         />
                       </div>
@@ -838,7 +838,7 @@ export default function InquiryDrawer({
                           type="text"
                           value={cityStatePincode}
                           onChange={(e) => setCityStatePincode(e.target.value)}
-                          placeholder="e.g. Malvan, Dist. Sindhudurg, Maharashtra 416606"
+                          placeholder="Enter complete address"
                           className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-sans text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#A61B1B] focus:border-[#A61B1B]"
                         />
                       </div>
@@ -855,7 +855,7 @@ export default function InquiryDrawer({
                             maxLength={10}
                             value={mobile}
                             onChange={(e) => setMobile(e.target.value.replace(/[^0-9]/g, ''))}
-                            placeholder="8378991750"
+                            placeholder="Enter 10-digit mobile number"
                             className="w-full pl-12 pr-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-sans text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#A61B1B] focus:border-[#A61B1B]"
                           />
                         </div>
